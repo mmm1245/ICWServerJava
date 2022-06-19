@@ -14,4 +14,6 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.5.3"
     implementation 'com.github.IndustrialCraft:InventorySystem:ab0720bd72'
     implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.github.IndustrialCraft:InventorySystem:bee76358fc'
+    implementation 'com.github.mikera:vectorz:0.55.0'
 }

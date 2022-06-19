@@ -2,7 +2,9 @@ package com.github.industrialcraft.icwserver.net;
 
 import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.util.Pair;
+import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
+import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import org.java_websocket.WebSocket;
@@ -18,9 +20,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class WSServer extends WebSocketServer
 {
-    private final List<ClientConnection> connections;
-    private final GameServer gameServer;
-    private final Queue<Pair<ClientConnection,Message>> messageQueue;
+    protected final List<ClientConnection> connections;
+    protected final GameServer gameServer;
+    protected final Queue<Pair<ClientConnection,Message>> messageQueue;
     public WSServer(InetSocketAddress address, GameServer gameServer) {
         super(address);
         this.connections = new ArrayList<>();
@@ -38,18 +40,18 @@ public class WSServer extends WebSocketServer
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        Entity player = conn.<ClientConnection>getAttachment().getPlayer();
+        PlayerEntity player = conn.<ClientConnection>getAttachment().player;
         if(player != null)
-            player.remove();
+            player.removeConnection();
         this.connections.remove(conn.getAttachment());
         conn.setAttachment(null);
+        System.out.println("disconnect: " + reason);
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
         try{
             Message parsedMessage = MessageRegistry.create(JsonParser.parseString(message).getAsJsonObject());
-            System.out.println(parsedMessage);  //todo:remove debug
             this.messageQueue.add(new Pair<>(conn.getAttachment(),parsedMessage));
         } catch (Exception ex){
             onError(conn, ex);
@@ -58,13 +60,14 @@ public class WSServer extends WebSocketServer
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
+        ex.printStackTrace();
         if(conn == null){
-            ex.printStackTrace();
             return;
         }
-        Entity player = conn.<ClientConnection>getAttachment().getPlayer();
+        PlayerEntity player = conn.<ClientConnection>getAttachment().player;
         if(player != null)
-            player.remove();
+            player.removeConnection();
+        conn.close();
     }
 
     @Override
@@ -74,7 +77,13 @@ public class WSServer extends WebSocketServer
 
     public void broadcast(Message message){
         for(ClientConnection connection : this.connections){
-            if(connection.getPlayer()!=null)
+            if(connection.player!=null)
+                connection.send(message);
+        }
+    }
+    public void broadcastInWorld(Message message, World world){
+        for(ClientConnection connection : this.connections){
+            if(connection.player!=null && connection.player.getLocation().world()==world)
                 connection.send(message);
         }
     }

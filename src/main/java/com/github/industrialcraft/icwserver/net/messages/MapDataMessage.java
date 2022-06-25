@@ -1,6 +1,7 @@
 package com.github.industrialcraft.icwserver.net.messages;
 
 import com.github.industrialcraft.icwserver.net.Message;
+import com.github.industrialcraft.icwserver.particle.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.google.gson.JsonArray;
@@ -22,6 +23,12 @@ public class MapDataMessage extends Message {
             entitiesJson.add(entity.toJson());
         }
         json.add("entities", entitiesJson);
+
+        JsonArray particleJson = new JsonArray();
+        for(Particle particle : world.getParticles()){
+            particleJson.add(particle.toJson());
+        }
+        json.add("particles", particleJson);
         return json;
     }
 

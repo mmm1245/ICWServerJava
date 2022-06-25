@@ -1,14 +1,9 @@
 package com.github.industrialcraft.icwserver.net;
 
-import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
-import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
-import com.github.industrialcraft.icwserver.net.messages.LoginMessage;
-import com.github.industrialcraft.icwserver.net.messages.PlayerAttackMessage;
+import com.github.industrialcraft.icwserver.net.messages.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.io.DataInputStream;
-import java.net.ProtocolException;
 import java.util.HashMap;
 
 public class MessageRegistry {
@@ -19,6 +14,8 @@ public class MessageRegistry {
         MessageRegistry.messageRegistry.put(ClientPlayerPositionMessage.TYPE, stream -> new ClientPlayerPositionMessage(stream));
         MessageRegistry.messageRegistry.put(PlayerAttackMessage.TYPE, stream -> new PlayerAttackMessage(stream));
         MessageRegistry.messageRegistry.put(InteractEntityMessage.TYPE, stream -> new InteractEntityMessage(stream));
+        MessageRegistry.messageRegistry.put(PlayerClickSlotMessage.TYPE, stream -> new PlayerClickSlotMessage(stream));
+        MessageRegistry.messageRegistry.put(OpenedInventoryActionMessage.TYPE, stream -> new OpenedInventoryActionMessage(stream));
     }
     public static Message create(JsonObject json){
         JsonElement typeElement = json.get("type");

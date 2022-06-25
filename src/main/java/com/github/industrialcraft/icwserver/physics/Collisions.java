@@ -3,11 +3,22 @@ package com.github.industrialcraft.icwserver.physics;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.IPhysicalEntity;
+import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import mikera.vectorz.Vector2;
 
 import java.util.function.Predicate;
 
 public class Collisions {
+    public static boolean bulletCanHit(Entity entity){
+        if(entity instanceof IPhysicalEntity pe){
+            if(pe.getPhysicalObject().layer==EPhysicsLayer.PROJECTILE)
+                return false;
+            if(entity instanceof ItemStackEntity)
+                return false;
+            return pe.getPhysicalObject().layer != EPhysicsLayer.TRANSPARENT;
+        }
+        return false;
+    }
     public static Entity lineIntersection(Vector2 start, Vector2 end, World world, Predicate<Entity> entityPredicate){
         Vector2 vec = null;
         Entity entityRet = null;

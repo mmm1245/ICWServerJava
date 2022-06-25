@@ -11,13 +11,29 @@ public class PlayerInventoryMessage extends Message {
     public static final String TYPE = "playerInventory";
 
     private Inventory inventory;
-    public PlayerInventoryMessage(Inventory inventory) {
+    private Inventory secondInventory;
+    private ItemStack handItem;
+    private float health;
+    public PlayerInventoryMessage(Inventory inventory, Inventory secondInventory, ItemStack handItem, float health) {
         this.inventory = inventory;
+        this.secondInventory = secondInventory;
+        this.handItem = handItem;
+        this.health = health;
     }
 
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
+        json.add("items", serializeInventory(inventory));
+        json.add("itemsSecond", serializeInventory(secondInventory));
+        json.add("handItem", ItemSerializer.toJson(handItem));
+        json.addProperty("health", this.health);
+        return json;
+    }
+
+    private static JsonArray serializeInventory(Inventory inventory){
+        if(inventory == null)
+            return null;
         JsonArray items = new JsonArray();
         for(int i = 0;i < inventory.getSize();i++){
             ItemStack is = inventory.getAt(i);
@@ -26,8 +42,7 @@ public class PlayerInventoryMessage extends Message {
             else
                 items.add(ItemSerializer.toJson(is));
         }
-        json.add("items", items);
-        return json;
+        return items;
     }
 
     @Override

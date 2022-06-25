@@ -3,6 +3,8 @@ package com.github.industrialcraft.icwserver.physics;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.IPhysicalEntity;
 
+import java.util.function.Predicate;
+
 public class PhysicsObject {
     protected final Entity entity;
     protected float hitboxW;
@@ -35,12 +37,28 @@ public class PhysicsObject {
         }
         return true;
     }
+    public Entity collidesAt(float x, float y, Predicate<Entity> entityPredicate){
+        for(Entity entity : entity.getLocation().world().getEntities()){
+            if(this.entity==entity||(!(entity instanceof IPhysicalEntity)))
+                continue;
+            if(this.entity.id == entity.id)
+                continue;
+            if(!entityPredicate.test(entity))
+                continue;
+            PhysicsObject physics2 = ((IPhysicalEntity) entity).getPhysicalObject();
+            if(Collisions.AABB(x, y, hitboxW, hitboxH, entity.getLocation().x(), entity.getLocation().y(), physics2.hitboxW, physics2.hitboxH))
+                return entity;
+        }
+        return null;
+    }
     public void resize(float hitboxW, float hitboxH){
         this.hitboxW = hitboxW;
         this.hitboxH = hitboxH;
     }
 
     protected static boolean collides(EPhysicsLayer layer1, EPhysicsLayer layer2){
+        if(layer1==EPhysicsLayer.TRANSPARENT||layer2==EPhysicsLayer.TRANSPARENT)
+            return false;
         return layer1==EPhysicsLayer.WALL||layer2==EPhysicsLayer.WALL;
     }
     public Entity getEntity() {

@@ -5,11 +5,11 @@ import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.util.Location;
-import com.github.industrialcraft.icwserver.world.entity.data.IOnPlayerInteract;
+import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
-public class ItemStackEntity extends DamageableEntity implements IPhysicalEntity, IOnPlayerInteract {
+public class ItemStackEntity extends DamageableEntity implements IPhysicalEntity, IPlayerInteractHandler {
     private ItemStack is;
     private PhysicsObject physicsObject;
     public ItemStackEntity(Location location, ItemStack is) {

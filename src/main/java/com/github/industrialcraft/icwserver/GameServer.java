@@ -1,20 +1,23 @@
 package com.github.industrialcraft.icwserver;
 
 import com.github.industrialcraft.icwserver.inventory.Items;
+import com.github.industrialcraft.icwserver.inventory.data.IActionProcessingInventory;
+import com.github.industrialcraft.icwserver.inventory.data.IPlayerAttackHandler;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.net.WSServer;
 import com.github.industrialcraft.icwserver.net.messages.*;
-import com.github.industrialcraft.icwserver.physics.Collisions;
+import com.github.industrialcraft.icwserver.physics.Raytracer;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.util.Pair;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.*;
+import com.github.industrialcraft.icwserver.world.entity.craftingStation.WoodWorkingStation;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.icwserver.world.entity.data.IDamagable;
-import com.github.industrialcraft.icwserver.world.entity.data.IOnPlayerInteract;
+import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
+import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
-import mikera.vectorz.Vector2;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ public class GameServer extends Thread{
 
         new PlatformEntity(new Location(0, -30, worlds.get(0)), 100, 5);
         new GeneratorEntity(new Location(20, 0, worlds.get(0)), 50, new ItemStack(Items.STONE, 10));
+        new WoodWorkingStation(new Location(50, 0, worlds.get(0)));
     }
     public World createWorld(){
         World world = new World(false, this);
@@ -55,21 +59,25 @@ public class GameServer extends Thread{
             }
             for(ClientConnection connection : this.server.getClientConnections()){
                 if(connection.player != null)
-                    connection.send(new PlayerInventoryMessage(connection.player.getInventory()));
+                    connection.send(new PlayerInventoryMessage(connection.player.getInventory(), connection.player.getOpenedInventory(), connection.player.getHandItemStack(), connection.player.getHealth()));
             }
             while(server.hasMessage()){
                 Pair<ClientConnection,Message> polled = server.pollMessage();
                 ClientConnection connection = polled.first;
                 Message pMsg = polled.second;
+                if(!connection.getConn().isOpen())
+                    continue;
                 if(pMsg instanceof LoginMessage msg){
                     if(connection.player!=null) {
                         connection.disconnect("already logged in");
                         continue;
                     }
                     PlayerEntity pl = new PlayerEntity(getLobby().getSpawn(), connection);
-                    connection.profile = new PlayerProfile(msg.username, UUID.randomUUID());
+                    connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
                     connection.send(new ControllingEntityMessage(pl));
+
+                    pl.getInventory().addItem(new ItemStack(Items.PISTOL, 1));
                     continue;
                 }
                 if(connection.player==null){
@@ -80,21 +88,40 @@ public class GameServer extends Thread{
                     connection.player.setLocationFromClient(msg);
                 }
                 if(pMsg instanceof PlayerAttackMessage msg){
-                    System.out.println("attack: " + msg);
-                    Vector2 start = new Vector2(connection.player.getLocation().x(), connection.player.getLocation().y());
-                    Vector2 end = new Vector2((int)(Math.cos(Math.toRadians((msg.angle+360)%360))*10), (int)(Math.sin(Math.toRadians((msg.angle+360)%360))*10));
-                    end.normalise();
-                    end.multiply(50);
-                    end.add(start);
-                    Entity entity = Collisions.lineIntersection(start, end, connection.player.getLocation().world(), ent -> ent.id != connection.player.id);
-                    if(entity instanceof IDamagable damagable){
-                        damagable.damage(-15, EDamageType.FIST);
+                    ItemStack hand = connection.player.getHandItemStack();
+                    if(hand != null && hand.getItem() instanceof IPlayerAttackHandler handler){
+                        handler.onAttack(connection.player, msg);
+                    } else {
+                        Entity entity = Raytracer.raytrace(connection.player.getLocation().addXY(2, 15), msg.angle, 50, ent -> ent.id != connection.player.id);
+                        if (entity instanceof IDamagable damagable) {
+                            damagable.damage(-15, EDamageType.FIST);
+                        }
                     }
                 }
                 if(pMsg instanceof InteractEntityMessage msg){
                     Entity entity = connection.player.getLocation().world().byId(msg.entityId);
-                    if(entity != null && entity instanceof IOnPlayerInteract interactEvent){
+                    if(entity != null && entity instanceof IPlayerInteractHandler interactEvent){
                         interactEvent.onPlayerInteract(connection.player, msg);
+                    }
+                }
+                if(pMsg instanceof PlayerClickSlotMessage msg){
+                    Inventory inv = msg.secondInventory?connection.player.getOpenedInventory():connection.player.getInventory();
+                    if(inv==null)
+                        continue;
+                    if(msg.slot >= 0 && msg.slot < inv.getSize()){
+                        ItemStack hand = connection.player.getHandItemStack();
+                        connection.player.setHandItemStack(inv.getAt(msg.slot));
+                        inv.setAt(msg.slot, hand);
+                    }
+                }
+                if(pMsg instanceof OpenedInventoryActionMessage msg){
+                    if(msg.action == 0){
+                        connection.player.closeInventory();
+                    } else {
+                        Inventory inv = connection.player.getOpenedInventory();
+                        if(inv != null && inv instanceof IActionProcessingInventory actionProcessingInventory){
+                            actionProcessingInventory.onInventoryAction(connection.player, inv, msg.action);
+                        }
                     }
                 }
             }

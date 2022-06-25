@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 
 public class ItemSerializer {
     public static JsonObject toJson(ItemStack is){
+        if(is == null)
+            return null;
         JsonObject json = new JsonObject();
         json.addProperty("id",((Item)is.getItem()).getIdentifier());
         json.addProperty("count", is.getCount());

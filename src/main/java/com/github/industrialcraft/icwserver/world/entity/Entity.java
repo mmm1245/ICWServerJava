@@ -43,6 +43,8 @@ public abstract class Entity implements IKillable, IJsonSerializable {
 
     public abstract String getType();
 
+    public void onDeath(){}
+
     @Override
     public boolean isDead() {
         return dead;

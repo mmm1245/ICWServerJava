@@ -120,7 +120,7 @@ public class GameServer extends Thread{
                     } else {
                         Inventory inv = connection.player.getOpenedInventory();
                         if(inv != null && inv instanceof IActionProcessingInventory actionProcessingInventory){
-                            actionProcessingInventory.onInventoryAction(connection.player, inv, msg.action);
+                            actionProcessingInventory.onInventoryAction(connection.player, inv, msg);
                         }
                     }
                 }

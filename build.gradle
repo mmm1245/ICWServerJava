@@ -15,4 +15,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.github.IndustrialCraft:InventorySystem:83e29753e1'
     implementation 'com.github.mikera:vectorz:0.55.0'
+    implementation 'org.openjdk.nashorn:nashorn-core:15.4'
 }

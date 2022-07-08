@@ -117,6 +117,7 @@ public class PlayerEntity extends DamageableEntity implements IPhysicalEntity, I
         return connection;
     }
     public void removeConnection(){
+        this.connection.player = null;
         this.connection = null;
     }
 }

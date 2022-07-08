@@ -1,19 +1,7 @@
 package com.github.industrialcraft.icwserver.inventory;
 
-import com.github.industrialcraft.icwserver.inventory.data.IPlayerAttackHandler;
-import com.github.industrialcraft.icwserver.net.messages.PlayerAttackMessage;
-import com.github.industrialcraft.icwserver.particle.GunshotParticle;
-import com.github.industrialcraft.icwserver.physics.Raytracer;
-import com.github.industrialcraft.icwserver.world.entity.Entity;
-import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
-import com.github.industrialcraft.icwserver.world.entity.ThrownEntity;
-import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
-import com.github.industrialcraft.icwserver.world.entity.data.IDamagable;
-import com.github.industrialcraft.inventorysystem.IItem;
-import mikera.vectorz.Vector2;
-
 public class Items {
-    public static IItem STONE = new ItemWithAttackAction(15, "stone") {
+    /*public static IItem STONE = new ItemWithAttackAction(15, "stone") {
         @Override
         public void onAttack(PlayerEntity player, PlayerAttackMessage message) {
             Vector2 dir = new Vector2((int) (Math.cos(Math.toRadians((message.angle + 360) % 360)) * 10), (int) (Math.sin(Math.toRadians((message.angle + 360) % 360)) * 10));
@@ -41,5 +29,5 @@ public class Items {
         public ItemWithAttackAction(int stackSize, String identifier) {
             super(stackSize, identifier);
         }
-    }
+    }*/
 }

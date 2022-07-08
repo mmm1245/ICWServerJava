@@ -1,7 +1,6 @@
 package com.github.industrialcraft.icwserver.world;
 
 import com.github.industrialcraft.icwserver.GameServer;
-import com.github.industrialcraft.icwserver.particle.Particle;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
@@ -36,7 +35,7 @@ public class World {
                 entity.onDeath();
         });
         entities.removeIf(entity -> entity.isDead()||entity.getLocation().world()!=this);
-        particles.removeIf(Particle::decreaseLifetime);
+        particles.removeIf(particle -> particle.decreaseLifetime(1));
         for(Entity entity : this.entities){
             entity.tick();
         }

@@ -1,7 +1,7 @@
 package com.github.industrialcraft.icwserver.net.messages;
 
 import com.github.industrialcraft.icwserver.net.Message;
-import com.github.industrialcraft.icwserver.particle.Particle;
+import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.google.gson.JsonArray;

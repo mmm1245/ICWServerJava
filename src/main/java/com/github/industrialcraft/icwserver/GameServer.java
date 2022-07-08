@@ -1,5 +1,6 @@
 package com.github.industrialcraft.icwserver;
 
+import com.github.industrialcraft.icwserver.inventory.Item;
 import com.github.industrialcraft.icwserver.inventory.Items;
 import com.github.industrialcraft.icwserver.inventory.data.IActionProcessingInventory;
 import com.github.industrialcraft.icwserver.inventory.data.IPlayerAttackHandler;
@@ -21,6 +22,8 @@ import com.github.industrialcraft.inventorysystem.ItemStack;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class GameServer extends Thread{
@@ -37,13 +40,16 @@ public class GameServer extends Thread{
         this.worldIdGenerator = 0;
 
         new PlatformEntity(new Location(0, -30, worlds.get(0)), 100, 5);
-        new GeneratorEntity(new Location(20, 0, worlds.get(0)), 50, new ItemStack(Items.STONE, 10));
         new WoodWorkingStation(new Location(50, 0, worlds.get(0)));
     }
     public World createWorld(){
         World world = new World(false, this);
         this.worlds.add(world);
         return world;
+    }
+
+    public WSServer getWSServer() {
+        return server;
     }
 
     @Override
@@ -76,8 +82,6 @@ public class GameServer extends Thread{
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
                     connection.send(new ControllingEntityMessage(pl));
-
-                    pl.getInventory().addItem(new ItemStack(Items.PISTOL, 1));
                     continue;
                 }
                 if(connection.player==null){
@@ -89,9 +93,7 @@ public class GameServer extends Thread{
                 }
                 if(pMsg instanceof PlayerAttackMessage msg){
                     ItemStack hand = connection.player.getHandItemStack();
-                    if(hand != null && hand.getItem() instanceof IPlayerAttackHandler handler){
-                        handler.onAttack(connection.player, msg);
-                    } else {
+                    if(hand == null || !((Item) hand.getItem()).onAttackHandlerCall(connection.player, hand, msg)) {
                         Entity entity = Raytracer.raytrace(connection.player.getLocation().addXY(2, 15), msg.angle, 50, ent -> ent.id != connection.player.id);
                         if (entity instanceof IDamagable damagable) {
                             damagable.damage(-15, EDamageType.FIST);
@@ -139,6 +141,10 @@ public class GameServer extends Thread{
                 return world;
         }
         return null;
+    }
+
+    public List<World> getWorlds() {
+        return Collections.unmodifiableList(worlds);
     }
     public int generateIDEntity(){
         return ++this.entityIdGenerator;

@@ -9,10 +9,11 @@ import java.net.InetSocketAddress;
 public class ICWServerMain {
     public static void main(String args[]){
         GameServer gameServer = new GameServer(new InetSocketAddress(5555));
-        //gameServer.run();
-
         ScriptingManager scriptingManager = new ScriptingManager(new JSGameServer(gameServer), true);
+        gameServer.setScriptingManager(scriptingManager);
+
         scriptingManager.runInitScript(new File("start.js"));
-        System.out.println(scriptingManager);
+
+        gameServer.run();
     }
 }

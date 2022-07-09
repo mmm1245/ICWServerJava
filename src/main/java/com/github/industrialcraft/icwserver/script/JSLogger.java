@@ -1,5 +1,7 @@
 package com.github.industrialcraft.icwserver.script;
 
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
+
 public class JSLogger {
     boolean debugEnabled;
     public JSLogger(boolean debugEnabled) {

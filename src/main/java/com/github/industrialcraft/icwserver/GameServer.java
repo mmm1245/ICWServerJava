@@ -9,6 +9,8 @@ import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.net.WSServer;
 import com.github.industrialcraft.icwserver.net.messages.*;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
+import com.github.industrialcraft.icwserver.script.ScriptingManager;
+import com.github.industrialcraft.icwserver.script.event.Events;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.util.Pair;
 import com.github.industrialcraft.icwserver.world.World;
@@ -31,6 +33,7 @@ public class GameServer extends Thread{
     protected final ArrayList<World> worlds;
     protected int entityIdGenerator;
     protected int worldIdGenerator;
+    protected ScriptingManager scriptingManager;
     public GameServer(InetSocketAddress address) {
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
@@ -82,6 +85,7 @@ public class GameServer extends Thread{
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
                     connection.send(new ControllingEntityMessage(pl));
+                    getEvents().PLAYER_JOIN.call(new Object[]{pl});
                     continue;
                 }
                 if(connection.player==null){
@@ -155,5 +159,16 @@ public class GameServer extends Thread{
 
     public World getLobby() {
         return this.worlds.get(0);
+    }
+
+    public ScriptingManager scriptingManager() {
+        return scriptingManager;
+    }
+    public void setScriptingManager(ScriptingManager scriptingManager) {
+        this.scriptingManager = scriptingManager;
+    }
+
+    public Events getEvents() {
+        return this.scriptingManager.getEvents();
     }
 }

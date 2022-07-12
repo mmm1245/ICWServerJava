@@ -1,9 +1,8 @@
 package com.github.industrialcraft.icwserver.script;
 
 import com.github.industrialcraft.icwserver.inventory.Item;
-import com.github.industrialcraft.icwserver.inventory.data.IActionProcessingInventory;
-import com.github.industrialcraft.icwserver.inventory.data.IPlayerAttackHandler;
-import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
+import com.github.industrialcraft.icwserver.util.State2AssetStorage;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,20 +25,30 @@ public class JSItemRegistry {
     public class ItemTemplate{
         private String id;
         private int stackSize;
-        private IPlayerAttackHandler attackHandler;
+        private ScriptObjectMirror attackHandler;
+        private ScriptObjectMirror animationStateProvider;
+        private State2AssetStorage state2AssetStorage;
         public ItemTemplate(String id, int stackSize) {
             this.id = id;
             this.stackSize = stackSize;
+            this.state2AssetStorage = new State2AssetStorage();
         }
-        public ItemTemplate withAttackHandler(IPlayerAttackHandler attackHandler){
+        public void addRenderState(String state, String asset){
+            this.state2AssetStorage.addState(state, asset);
+        }
+        public ItemTemplate withAttackHandler(ScriptObjectMirror attackHandler){
             this.attackHandler = attackHandler;
+            return this;
+        }
+        public ItemTemplate withAnimationStateProvider(ScriptObjectMirror animationStateProvider){
+            this.animationStateProvider = animationStateProvider;
             return this;
         }
 
         public Item register(){
             if(items.containsKey(id))
                 throw new IllegalStateException(id + " already registered");
-            Item item = new Item(stackSize, id, attackHandler);
+            Item item = new Item(stackSize, id, attackHandler, animationStateProvider, state2AssetStorage);
             items.put(id, item);
             return item;
         }

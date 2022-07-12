@@ -1,24 +1,20 @@
 package com.github.industrialcraft.icwserver.script;
 
-import com.github.industrialcraft.icwserver.inventory.data.IInventoryHolder;
 import com.github.industrialcraft.icwserver.net.Message;
-import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
-import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
+import com.github.industrialcraft.icwserver.net.messages.CustomDataMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
-import com.github.industrialcraft.icwserver.util.Location;
+import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
-import com.google.gson.JsonObject;
-import org.java_websocket.framing.CloseFrame;
 
 public class JSPlayer {
     PlayerEntity player;
     public JSPlayer(PlayerEntity player) {
         this.player = player;
     }
-    public void openInventory(IInventoryHolder holder){
-        this.player.openInventory(holder);
+    public void openInventory(Entity entity){
+        this.player.openInventory(entity);
     }
     public void closeInventory(){
         this.player.closeInventory();
@@ -59,5 +55,11 @@ public class JSPlayer {
     }
     public void sendMessage(Message message){
         player.getConnection().send(message);
+    }
+    public void sendCustomMessage(String type){
+        player.getConnection().send(new CustomDataMessage(type, null));
+    }
+    public void sendCustomMessage(String type, String data){
+        player.getConnection().send(new CustomDataMessage(type, data));
     }
 }

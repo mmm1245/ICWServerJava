@@ -7,6 +7,7 @@ import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.net.WSServer;
 import com.github.industrialcraft.icwserver.net.messages.*;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
+import com.github.industrialcraft.icwserver.script.JSGameServer;
 import com.github.industrialcraft.icwserver.script.JSWorld;
 import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.script.event.Events;
@@ -17,10 +18,10 @@ import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.*;
 import com.github.industrialcraft.icwserver.world.entity.craftingStation.WoodWorkingStation;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
-import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,26 +34,28 @@ public class GameServer extends Thread{
     protected int entityIdGenerator;
     protected int worldIdGenerator;
     protected ScriptingManager scriptingManager;
-    public GameServer(InetSocketAddress address) {
+    protected long ticksLasted;
+    public GameServer(InetSocketAddress address, File[] files) {
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
         this.worlds = new ArrayList<>();
         this.entityIdGenerator = 0;
         this.worldIdGenerator = 0;
-    }
-    public void init(){
+        this.ticksLasted = 0;
+        this.scriptingManager = new ScriptingManager(new JSGameServer(this), true);
+        this.scriptingManager.runScripts(files);
         this.worlds.add(new World(true, this));
-        scriptingManager.getEvents().CREATE_WORLD.call(new JSWorld(this.worlds.get(0)));
+        getEvents().CREATE_WORLD.call(new JSWorld(this.worlds.get(0)));
 
         new PlatformEntity(new Location(0, -30, worlds.get(0)), 100, 5);
         new WoodWorkingStation(new Location(50, 0, worlds.get(0)));
 
-        scriptingManager.getEvents().START_SERVER.call();
+        getEvents().START_SERVER.call();
     }
     public World createWorld(){
         World world = new World(false, this);
         this.worlds.add(world);
-        scriptingManager.getEvents().CREATE_WORLD.call(new JSWorld(world));
+        getEvents().CREATE_WORLD.call(new JSWorld(world));
         return world;
     }
 
@@ -65,7 +68,9 @@ public class GameServer extends Thread{
         server.start();
         while(true) {
             this.worlds.removeIf(world -> world.isRemoved());
+            getEvents().SERVER_TICK.call();
             for (World world : this.worlds) {
+                getEvents().WORLD_TICK.call(world);
                 world.tick();
             }
             for (World world : this.worlds){
@@ -105,13 +110,14 @@ public class GameServer extends Thread{
                     if(hand == null || !((Item) hand.getItem()).onAttackHandlerCall(connection.player, hand, msg)) {
                         connection.player.getLocation().world().addParticle(new Particle("fist", 5, connection.player.getLocation()).addNumber("angle", msg.angle));
                         Entity entity = Raytracer.raytrace(connection.player.getLocation().addXY(2, 15), msg.angle, 50, ent -> ent.id != connection.player.id);
-                        entity.damage(-15, EDamageType.FIST);
+                        if(entity != null)
+                            entity.damage(-15, EDamageType.FIST);
                     }
                 }
                 if(pMsg instanceof InteractEntityMessage msg){
                     Entity entity = connection.player.getLocation().world().byId(msg.entityId);
-                    if(entity != null && entity instanceof IPlayerInteractHandler interactEvent){
-                        interactEvent.onPlayerInteract(connection.player, msg);
+                    if(entity != null){
+                        entity.onPlayerInteract(connection.player, msg);
                     }
                 }
                 if(pMsg instanceof PlayerClickSlotMessage msg){
@@ -134,6 +140,9 @@ public class GameServer extends Thread{
                         }
                     }
                 }
+                if(pMsg instanceof CustomDataMessage msg){
+                    getEvents().CUSTOM_MESSAGE_RECEIVED.call(msg.type, msg.data);
+                }
             }
             try {
                 Thread.sleep(50);
@@ -141,7 +150,11 @@ public class GameServer extends Thread{
                 e.printStackTrace();
                 return;
             }
+            this.ticksLasted++;
         }
+    }
+    public long ticksLasted() {
+        return ticksLasted;
     }
     public World worldById(int id){
         for(World world : this.worlds){
@@ -165,14 +178,11 @@ public class GameServer extends Thread{
         return this.worlds.get(0);
     }
 
-    public ScriptingManager scriptingManager() {
+    public ScriptingManager getScriptingManager() {
         return scriptingManager;
-    }
-    public void setScriptingManager(ScriptingManager scriptingManager) {
-        this.scriptingManager = scriptingManager;
     }
 
     public Events getEvents() {
-        return this.scriptingManager.getEvents();
+        return this.scriptingManager.events;
     }
 }

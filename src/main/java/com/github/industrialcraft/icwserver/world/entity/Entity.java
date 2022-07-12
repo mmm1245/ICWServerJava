@@ -1,11 +1,14 @@
 package com.github.industrialcraft.icwserver.world.entity;
 
+import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
+import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.util.IJsonSerializable;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.icwserver.world.entity.data.IKillable;
 import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
+import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
 
 public abstract class Entity implements IKillable, IJsonSerializable {
@@ -20,6 +23,10 @@ public abstract class Entity implements IKillable, IJsonSerializable {
         this.location.world().addEntity(this);
         this.health = getMaxHealth();
         this.id = location.world().getServer().generateIDEntity();
+    }
+
+    public GameServer getServer(){
+        return location.world().getServer();
     }
 
     public abstract void tick();
@@ -74,6 +81,10 @@ public abstract class Entity implements IKillable, IJsonSerializable {
         setHealth(healthNew);
     }
 
+    public Inventory getInventory(){
+        return null;
+    }
+
     public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message){
         return false;
     }
@@ -85,5 +96,9 @@ public abstract class Entity implements IKillable, IJsonSerializable {
     @Override
     public void kill() {
         this.dead = true;
+    }
+
+    public PhysicsObject getPhysicalObject() {
+        return null;
     }
 }

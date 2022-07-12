@@ -2,7 +2,6 @@ package com.github.industrialcraft.icwserver.physics;
 
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
-import com.github.industrialcraft.icwserver.world.entity.IPhysicalEntity;
 import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import mikera.vectorz.Vector2;
 
@@ -10,32 +9,31 @@ import java.util.function.Predicate;
 
 public class Collisions {
     public static boolean bulletCanHit(Entity entity){
-        if(entity instanceof IPhysicalEntity pe){
-            if(pe.getPhysicalObject().layer==EPhysicsLayer.PROJECTILE)
-                return false;
-            if(entity instanceof ItemStackEntity)
-                return false;
-            return pe.getPhysicalObject().layer != EPhysicsLayer.TRANSPARENT;
-        }
-        return false;
+        if(entity.getPhysicalObject()==null)
+            return false;
+        if(entity.getPhysicalObject().layer==EPhysicsLayer.PROJECTILE)
+            return false;
+        if(entity instanceof ItemStackEntity)
+            return false;
+        return entity.getPhysicalObject().layer != EPhysicsLayer.TRANSPARENT;
     }
     public static Entity lineIntersection(Vector2 start, Vector2 end, World world, Predicate<Entity> entityPredicate){
         Vector2 vec = null;
         Entity entityRet = null;
         for(Entity entity : world.getEntities()){
-            if(entity instanceof IPhysicalEntity physicalEntity){
-                if(!entityPredicate.test(entity))
-                    continue;
-                PhysicsObject po = physicalEntity.getPhysicalObject();
-                Vector2 intersect = lineIntersectAABB(start, end, new Vector2(entity.getLocation().x(), entity.getLocation().y()), new Vector2(entity.getLocation().x()+po.hitboxW, entity.getLocation().y()+po.hitboxH));
-                if(vec == null && intersect != null){
+            if(!entityPredicate.test(entity))
+                continue;
+            PhysicsObject po = entity.getPhysicalObject();
+            if(po==null)
+                continue;
+            Vector2 intersect = lineIntersectAABB(start, end, new Vector2(entity.getLocation().x(), entity.getLocation().y()), new Vector2(entity.getLocation().x()+po.hitboxW, entity.getLocation().y()+po.hitboxH));
+            if(vec == null && intersect != null){
+                vec = intersect;
+                entityRet = entity;
+            } else if(intersect != null){
+                if(intersect.distance(start) < vec.distance(start)) {
                     vec = intersect;
                     entityRet = entity;
-                } else if(intersect != null){
-                    if(intersect.distance(start) < vec.distance(start)) {
-                        vec = intersect;
-                        entityRet = entity;
-                    }
                 }
             }
         }

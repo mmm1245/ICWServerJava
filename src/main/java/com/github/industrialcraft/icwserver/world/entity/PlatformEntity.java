@@ -6,7 +6,7 @@ import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.google.gson.JsonObject;
 
-public class PlatformEntity extends Entity implements IPhysicalEntity{
+public class PlatformEntity extends Entity {
     private PhysicsObject physicsObject;
     public PlatformEntity(Location location, int width, int height) {
         super(location);

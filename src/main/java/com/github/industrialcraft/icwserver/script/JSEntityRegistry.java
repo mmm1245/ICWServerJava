@@ -1,7 +1,9 @@
 package com.github.industrialcraft.icwserver.script;
 
+import com.github.industrialcraft.icwserver.inventory.data.InventoryCreationData;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObjectDataHolder;
+import com.github.industrialcraft.icwserver.util.State2AssetStorage;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import java.util.Collections;
@@ -32,9 +34,15 @@ public class JSEntityRegistry {
         private ScriptObjectMirror damageTypeModifierMethod;
         private ScriptObjectMirror animationStateProvider;
         private PhysicsObjectDataHolder physicsData;
+        private State2AssetStorage state2AssetStorage;
+        private InventoryCreationData inventoryCreationData;
         public EntityTemplate(String id, int maxHealth) {
             this.id = id;
             this.maxHealth = maxHealth;
+            this.state2AssetStorage = new State2AssetStorage();
+        }
+        public void addRenderState(String state, String asset){
+            this.state2AssetStorage.addState(state, asset);
         }
         public EntityTemplate withOnSpawn(ScriptObjectMirror method){
             this.spawnMethod = method;
@@ -64,11 +72,15 @@ public class JSEntityRegistry {
             this.physicsData = new PhysicsObjectDataHolder(width, height, physicsLayer);
             return this;
         }
+        public EntityTemplate withInventory(int size){
+            this.inventoryCreationData = new InventoryCreationData(size);
+            return this;
+        }
 
         public JSEntityData register(){
             if(entities.containsKey(id))
                 throw new IllegalStateException(id + " already registered");
-            JSEntityData entityData = new JSEntityData(id, maxHealth, spawnMethod, tickMethod, onDeathMethod, onPlayerInteractMethod, damageTypeModifierMethod, animationStateProvider, physicsData);
+            JSEntityData entityData = new JSEntityData(id, maxHealth, spawnMethod, tickMethod, onDeathMethod, onPlayerInteractMethod, damageTypeModifierMethod, animationStateProvider, physicsData, state2AssetStorage, inventoryCreationData);
             entities.put(id, entityData);
             return entityData;
         }

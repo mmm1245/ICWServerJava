@@ -9,7 +9,7 @@ import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHan
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
-public class ItemStackEntity extends Entity implements IPhysicalEntity {
+public class ItemStackEntity extends Entity {
     private ItemStack is;
     private PhysicsObject physicsObject;
     public ItemStackEntity(Location location, ItemStack is) {

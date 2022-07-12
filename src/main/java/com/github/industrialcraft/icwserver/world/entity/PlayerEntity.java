@@ -1,6 +1,5 @@
 package com.github.industrialcraft.icwserver.world.entity;
 
-import com.github.industrialcraft.icwserver.inventory.data.IInventoryHolder;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
 import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
@@ -11,11 +10,11 @@ import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
-public class PlayerEntity extends Entity implements IPhysicalEntity, IInventoryHolder {
+public class PlayerEntity extends Entity {
     private ClientConnection connection;
     public final PhysicsObject physicsObject;
     private Inventory inventory;
-    private Inventory openedInventory;
+    private Entity openedInventory;
     private ItemStack handItemStack;
     public PlayerEntity(Location location, ClientConnection connection) {
         super(location);
@@ -32,18 +31,24 @@ public class PlayerEntity extends Entity implements IPhysicalEntity, IInventoryH
     }
     @Override
     public void tick() {
-        if(openedInventory != null && openedInventory.<IInventoryHolder>getData().isInvalidForPlayer(this))
+        if(openedInventory != null && (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50))
             openedInventory = null;
     }
 
-    public void openInventory(IInventoryHolder holder){
-        this.openedInventory = holder.getInventory();
+    public void openInventory(Entity entity){
+        if(entity.getInventory()==null)
+            return;
+        if(entity instanceof PlayerEntity)
+            return;
+        this.openedInventory = entity;
     }
     public void closeInventory(){
         this.openedInventory = null;
     }
     public Inventory getOpenedInventory(){
-        return this.openedInventory;
+        if(this.openedInventory == null)
+            return null;
+        return this.openedInventory.getInventory();
     }
 
     @Override
@@ -102,10 +107,6 @@ public class PlayerEntity extends Entity implements IPhysicalEntity, IInventoryH
     @Override
     public Inventory getInventory() {
         return inventory;
-    }
-    @Override
-    public boolean isInvalidForPlayer(PlayerEntity player) {
-        return false;
     }
 
     @Override

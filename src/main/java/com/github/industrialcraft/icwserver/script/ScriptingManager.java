@@ -1,26 +1,26 @@
 package com.github.industrialcraft.icwserver.script;
 
 import com.github.industrialcraft.icwserver.script.event.Events;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 import javax.script.*;
 import java.io.File;
 import java.io.FileReader;
 
 public class ScriptingManager {
-    private ScriptEngineManager manager;
+    private NashornScriptEngineFactory manager;
     private ScriptEngine engine;
     private Bindings binding;
 
-    private JSItemRegistry itemRegistry;
-    private JSEntityRegistry entityRegistry;
-    private JSGameServer gameServer;
-    private Events events;
+    public final JSItemRegistry itemRegistry;
+    public final JSEntityRegistry entityRegistry;
+    public final JSGameServer gameServer;
+    public final Events events;
     public ScriptingManager(JSGameServer gameServer, boolean debugEnabled) {
         this.gameServer = gameServer;
-        this.manager = new ScriptEngineManager();
-        this.engine = manager.getEngineByName("JavaScript");
+        this.manager = new NashornScriptEngineFactory();
+        this.engine = manager.getScriptEngine(className -> false);
         this.events = new Events();
-
         this.binding = this.engine.createBindings();
 
         this.itemRegistry = new JSItemRegistry();
@@ -39,7 +39,7 @@ public class ScriptingManager {
 
         this.engine.setBindings(this.binding, ScriptContext.GLOBAL_SCOPE);
     }
-    public void runInitScript(File... scripts){
+    public void runScripts(File... scripts){
         for(File file : scripts){
             try {
                 FileReader reader = new FileReader(file);
@@ -49,9 +49,5 @@ public class ScriptingManager {
                 e.printStackTrace();
             }
         }
-    }
-
-    public Events getEvents() {
-        return events;
     }
 }

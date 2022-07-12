@@ -15,6 +15,9 @@ public class JSGameServer {
     public JSGameServer(GameServer server){
         this.gameServer = server;
     }
+    public long ticksLasted() {
+        return gameServer.ticksLasted();
+    }
     public JSWorld createWorld(){
         return new JSWorld(this.gameServer.createWorld());
     }

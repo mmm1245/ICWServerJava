@@ -1,19 +1,32 @@
 package com.github.industrialcraft.icwserver.world.entity.js;
 
 import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
+import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.script.JSEntityData;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
+import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
+import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
 
 public class EntityFromJS extends Entity {
-    JSEntityData data;
+    private JSEntityData data;
+    private PhysicsObject physicsObject;
+    private Inventory inventory;
     public EntityFromJS(JSEntityData data, Location location) {
         super(location);
         this.data = data;
+        if(data.physicsData!=null)
+            this.physicsObject = data.physicsData.create(this);
         this.setHealth(getMaxHealth());
+        this.inventory = data.inventoryCreationData==null?null:data.inventoryCreationData.create((inventory1, is) -> {
+            EntityFromJS ent = inventory1.getData();
+            if(!ent.isDead()){
+                new ItemStackEntity(ent.getLocation(), is);
+            }
+        }, this);
         if(data.spawnMethod != null)
             data.spawnMethod.call(this);
     }
@@ -27,6 +40,8 @@ public class EntityFromJS extends Entity {
     public void onDeath() {
         if(data.onDeathMethod != null)
             data.onDeathMethod.call(this);
+        if(inventory != null)
+            inventory.dropAll();
     }
     @Override
     public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
@@ -50,7 +65,6 @@ public class EntityFromJS extends Entity {
             json.addProperty("state", data.animationStateProvider.call(this).toString());
         return json;
     }
-
     @Override
     public String getType() {
         return data.type;
@@ -58,5 +72,15 @@ public class EntityFromJS extends Entity {
     @Override
     public float getMaxHealth() {
         return data==null?1:data.maxHealth;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public PhysicsObject getPhysicalObject() {
+        return this.physicsObject;
     }
 }

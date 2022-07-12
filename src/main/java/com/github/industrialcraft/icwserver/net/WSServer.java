@@ -1,11 +1,10 @@
 package com.github.industrialcraft.icwserver.net;
 
 import com.github.industrialcraft.icwserver.GameServer;
+import com.github.industrialcraft.icwserver.net.messages.AssetDataMessage;
 import com.github.industrialcraft.icwserver.util.Pair;
 import com.github.industrialcraft.icwserver.world.World;
-import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
-import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -35,14 +34,17 @@ public class WSServer extends WebSocketServer
         ClientConnection clientConnection = new ClientConnection(conn);
         conn.setAttachment(clientConnection);
         this.connections.add(clientConnection);
+        clientConnection.send(new AssetDataMessage(gameServer.getScriptingManager().entityRegistry, gameServer.getScriptingManager().itemRegistry));
         System.out.println("new connection");
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         PlayerEntity player = conn.<ClientConnection>getAttachment().player;
-        if(player != null)
+        if(player != null) {
+            player.getServer().getEvents().PLAYER_LEAVE.call(player);
             player.removeConnection();
+        }
         this.connections.remove(conn.getAttachment());
         conn.setAttachment(null);
         System.out.println("disconnect: " + reason);

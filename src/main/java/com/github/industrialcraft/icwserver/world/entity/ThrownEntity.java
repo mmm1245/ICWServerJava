@@ -9,7 +9,7 @@ import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
-public class ThrownEntity extends Entity implements IPhysicalEntity{
+public class ThrownEntity extends Entity {
     private PhysicsObject physicsObject;
     private float velX;
     private float velY;

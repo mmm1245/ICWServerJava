@@ -16,6 +16,7 @@ public class MessageRegistry {
         MessageRegistry.messageRegistry.put(InteractEntityMessage.TYPE, stream -> new InteractEntityMessage(stream));
         MessageRegistry.messageRegistry.put(PlayerClickSlotMessage.TYPE, stream -> new PlayerClickSlotMessage(stream));
         MessageRegistry.messageRegistry.put(OpenedInventoryActionMessage.TYPE, stream -> new OpenedInventoryActionMessage(stream));
+        MessageRegistry.messageRegistry.put(CustomDataMessage.TYPE, stream -> new CustomDataMessage(stream));
     }
     public static Message create(JsonObject json){
         JsonElement typeElement = json.get("type");

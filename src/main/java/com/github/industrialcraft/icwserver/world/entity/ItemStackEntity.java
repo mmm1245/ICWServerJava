@@ -9,7 +9,7 @@ import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHan
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
-public class ItemStackEntity extends DamageableEntity implements IPhysicalEntity, IPlayerInteractHandler {
+public class ItemStackEntity extends Entity implements IPhysicalEntity {
     private ItemStack is;
     private PhysicsObject physicsObject;
     public ItemStackEntity(Location location, ItemStack is) {
@@ -46,8 +46,11 @@ public class ItemStackEntity extends DamageableEntity implements IPhysicalEntity
     }
 
     @Override
-    public void onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
-        player.getInventory().addItem(is.clone());
-        kill();
+    public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
+        if(!isDead()) {
+            player.getInventory().addItem(is.clone());
+            kill();
+        }
+        return true;
     }
 }

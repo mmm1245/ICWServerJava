@@ -16,7 +16,7 @@ public class JSWorld {
         this.world = world;
     }
 
-    public JSLocation spawn(){
+    public JSLocation spawnpoint(){
         return new JSLocation(world.getSpawn());
     }
     public void remove(){

@@ -5,14 +5,14 @@ import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.physics.PhysicsObjectDataHolder;
 import com.github.industrialcraft.icwserver.util.Location;
-import com.github.industrialcraft.icwserver.world.entity.DamageableEntity;
+import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.IPhysicalEntity;
 import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.Inventory;
 
-public abstract class CraftingStation extends DamageableEntity implements IPhysicalEntity, IPlayerInteractHandler, IInventoryHolder {
+public abstract class CraftingStation extends Entity implements IPhysicalEntity, IInventoryHolder {
     protected PhysicsObject physicsObject;
     protected Inventory inventory;
     public CraftingStation(Location location, PhysicsObjectDataHolder physicsHolder, int size) {
@@ -39,7 +39,8 @@ public abstract class CraftingStation extends DamageableEntity implements IPhysi
     }
 
     @Override
-    public void onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
+    public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
         player.openInventory(this);
+        return true;
     }
 }

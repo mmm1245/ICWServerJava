@@ -12,6 +12,7 @@ public class ScriptingManager {
     private Bindings binding;
 
     private JSItemRegistry itemRegistry;
+    private JSEntityRegistry entityRegistry;
     private JSGameServer gameServer;
     private Events events;
     public ScriptingManager(JSGameServer gameServer, boolean debugEnabled) {
@@ -25,6 +26,10 @@ public class ScriptingManager {
         this.itemRegistry = new JSItemRegistry();
         this.binding.put("itemRegistry", this.itemRegistry);
         this.binding.put("items", this.itemRegistry.getItems());
+
+        this.entityRegistry = new JSEntityRegistry();
+        this.binding.put("entityRegistry", this.entityRegistry);
+        this.binding.put("entities", this.entityRegistry.getEntities());
 
         this.binding.put("log", new JSLogger(debugEnabled));
 

@@ -12,7 +12,7 @@ public class Event {
     public void register(ScriptObjectMirror scriptLambda){
         registered.add(scriptLambda);
     }
-    public void call(Object[] data){
+    public void call(Object... data){
         for(ScriptObjectMirror scriptObject : registered){
             scriptObject.call(null, data);
         }

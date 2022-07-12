@@ -5,6 +5,7 @@ import com.github.industrialcraft.icwserver.net.messages.PlayerAttackMessage;
 import com.github.industrialcraft.icwserver.util.IJsonSerializable;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.inventorysystem.IItem;
+import com.github.industrialcraft.inventorysystem.ItemData;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
@@ -37,5 +38,17 @@ public class Item implements IItem {
     @Override
     public int getStackSize() {
         return stackSize;
+    }
+
+    @Override
+    public ItemData createData(ItemStack is) {
+        return new JSItemData(is);
+    }
+    public static class JSItemData extends ItemData{
+        Object data;
+        public JSItemData(ItemStack is) {
+            super(is);
+            this.data = null;
+        }
     }
 }

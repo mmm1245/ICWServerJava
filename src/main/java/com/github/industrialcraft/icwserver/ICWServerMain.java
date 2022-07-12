@@ -11,9 +11,8 @@ public class ICWServerMain {
         GameServer gameServer = new GameServer(new InetSocketAddress(5555));
         ScriptingManager scriptingManager = new ScriptingManager(new JSGameServer(gameServer), true);
         gameServer.setScriptingManager(scriptingManager);
-
         scriptingManager.runInitScript(new File("start.js"));
-
+        gameServer.init();
         gameServer.run();
     }
 }

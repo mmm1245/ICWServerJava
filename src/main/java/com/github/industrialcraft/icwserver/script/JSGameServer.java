@@ -35,13 +35,11 @@ public class JSGameServer {
         this.gameServer.getWSServer().broadcastInWorld(message, world.getInternal());
     }
 
-    public List<ClientConnection> clientConnections() {
-        return this.gameServer.getWSServer().getClientConnections();
-    }
-    public List<PlayerEntity> players() {
+    public List<JSPlayer> players() {
         return this.gameServer.getWSServer().getClientConnections().stream()
                 .map(clientConnection -> clientConnection.player)
                 .filter(player -> player != null)
+                .map(player -> new JSPlayer(player))
                 .collect(Collectors.toUnmodifiableList());
     }
 }

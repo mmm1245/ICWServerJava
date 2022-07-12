@@ -1,23 +1,22 @@
 package com.github.industrialcraft.icwserver;
 
 import com.github.industrialcraft.icwserver.inventory.Item;
-import com.github.industrialcraft.icwserver.inventory.Items;
 import com.github.industrialcraft.icwserver.inventory.data.IActionProcessingInventory;
-import com.github.industrialcraft.icwserver.inventory.data.IPlayerAttackHandler;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.net.WSServer;
 import com.github.industrialcraft.icwserver.net.messages.*;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
+import com.github.industrialcraft.icwserver.script.JSWorld;
 import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.script.event.Events;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.util.Pair;
+import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.*;
 import com.github.industrialcraft.icwserver.world.entity.craftingStation.WoodWorkingStation;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
-import com.github.industrialcraft.icwserver.world.entity.data.IDamagable;
 import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
@@ -38,16 +37,22 @@ public class GameServer extends Thread{
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
         this.worlds = new ArrayList<>();
-        this.worlds.add(new World(true, this));
         this.entityIdGenerator = 0;
         this.worldIdGenerator = 0;
+    }
+    public void init(){
+        this.worlds.add(new World(true, this));
+        scriptingManager.getEvents().CREATE_WORLD.call(new JSWorld(this.worlds.get(0)));
 
         new PlatformEntity(new Location(0, -30, worlds.get(0)), 100, 5);
         new WoodWorkingStation(new Location(50, 0, worlds.get(0)));
+
+        scriptingManager.getEvents().START_SERVER.call();
     }
     public World createWorld(){
         World world = new World(false, this);
         this.worlds.add(world);
+        scriptingManager.getEvents().CREATE_WORLD.call(new JSWorld(world));
         return world;
     }
 
@@ -85,7 +90,7 @@ public class GameServer extends Thread{
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
                     connection.send(new ControllingEntityMessage(pl));
-                    getEvents().PLAYER_JOIN.call(new Object[]{pl});
+                    getEvents().PLAYER_JOIN.call(pl);
                     continue;
                 }
                 if(connection.player==null){
@@ -98,10 +103,9 @@ public class GameServer extends Thread{
                 if(pMsg instanceof PlayerAttackMessage msg){
                     ItemStack hand = connection.player.getHandItemStack();
                     if(hand == null || !((Item) hand.getItem()).onAttackHandlerCall(connection.player, hand, msg)) {
+                        connection.player.getLocation().world().addParticle(new Particle("fist", 5, connection.player.getLocation()).addNumber("angle", msg.angle));
                         Entity entity = Raytracer.raytrace(connection.player.getLocation().addXY(2, 15), msg.angle, 50, ent -> ent.id != connection.player.id);
-                        if (entity instanceof IDamagable damagable) {
-                            damagable.damage(-15, EDamageType.FIST);
-                        }
+                        entity.damage(-15, EDamageType.FIST);
                     }
                 }
                 if(pMsg instanceof InteractEntityMessage msg){

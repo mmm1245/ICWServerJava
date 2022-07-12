@@ -11,7 +11,7 @@ import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
-public class PlayerEntity extends DamageableEntity implements IPhysicalEntity, IInventoryHolder {
+public class PlayerEntity extends Entity implements IPhysicalEntity, IInventoryHolder {
     private ClientConnection connection;
     public final PhysicsObject physicsObject;
     private Inventory inventory;

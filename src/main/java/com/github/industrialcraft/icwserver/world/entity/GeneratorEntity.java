@@ -7,7 +7,7 @@ import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 
-public class GeneratorEntity extends DamageableEntity implements IPhysicalEntity{
+public class GeneratorEntity extends Entity implements IPhysicalEntity{
     private int healthPoints;
     private ItemStack item;
     private PhysicsObject physicsObject;
@@ -37,14 +37,6 @@ public class GeneratorEntity extends DamageableEntity implements IPhysicalEntity
     @Override
     public float getMaxHealth() {
         return healthPoints;
-    }
-
-    @Override
-    public void damage(float damage, EDamageType type) {
-        float healthNew = getHealth()+(damage*getDamageTypeModifier(type));
-        if(healthNew > getMaxHealth())
-            healthNew = getMaxHealth();
-        setHealth(healthNew);
     }
 
     @Override

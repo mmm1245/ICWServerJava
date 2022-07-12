@@ -1,5 +1,6 @@
 package com.github.industrialcraft.icwserver.world;
 
+import com.github.industrialcraft.icwserver.util.Location;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -16,7 +17,14 @@ public class Particle {
         this.lifetime = lifetime;
         this.data = new JsonObject();
     }
-    public Particle addInt(String property, int value){
+    public Particle(String type, int lifetime, Location location) {
+        this.type = type;
+        this.x = location.x();
+        this.y = location.y();
+        this.lifetime = lifetime;
+        this.data = new JsonObject();
+    }
+    public Particle addNumber(String property, Number value){
         data.addProperty(property, value);
         return this;
     }

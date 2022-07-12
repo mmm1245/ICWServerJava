@@ -6,7 +6,6 @@ import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
-import com.github.industrialcraft.icwserver.world.entity.data.IDamagable;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
@@ -35,8 +34,7 @@ public class ThrownEntity extends Entity implements IPhysicalEntity{
         this.velX -= (velX>0?1:-1)*0.02;
         Entity collision = this.physicsObject.collidesAt(location.x() + velX, location.y() + velY, entity -> (Collisions.bulletCanHit(entity))&&entity.id!=shooterId);
         if(collision != null){
-            if(collision instanceof IDamagable damagable)
-                damagable.damage(-10, EDamageType.THROWN);
+            collision.damage(-10, EDamageType.THROWN);
             kill();
         }
         this.physicsObject.moveBy(velX, velY);
@@ -52,6 +50,11 @@ public class ThrownEntity extends Entity implements IPhysicalEntity{
     @Override
     public void onDeath() {
         new ItemStackEntity(this.getLocation(), projectileItem.clone());
+    }
+
+    @Override
+    public float getMaxHealth() {
+        return 20;
     }
 
     @Override

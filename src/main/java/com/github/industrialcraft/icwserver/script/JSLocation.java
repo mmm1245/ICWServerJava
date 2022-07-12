@@ -45,4 +45,8 @@ public class JSLocation {
     public JSWorld world(){
         return new JSWorld(location.world());
     }
+
+    public Location getInternal(){
+        return this.location;
+    }
 }

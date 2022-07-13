@@ -9,7 +9,7 @@ public abstract class Message {
 
     protected static JsonElement getOrException(JsonObject json, String field){
         JsonElement element = json.get(field);
-        if(element.isJsonNull())
+        if(element == null || element.isJsonNull())
             throw new RuntimeException("field "+field+" was null on " + json.get("type").getAsString());
         return element;
     }

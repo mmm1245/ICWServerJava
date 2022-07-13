@@ -91,6 +91,7 @@ public class GameServer extends Thread{
                         connection.disconnect("already logged in");
                         continue;
                     }
+                    //todo: check player names
                     PlayerEntity pl = new PlayerEntity(getLobby().getSpawn(), connection);
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
@@ -142,6 +143,10 @@ public class GameServer extends Thread{
                 }
                 if(pMsg instanceof CustomDataMessage msg){
                     getEvents().CUSTOM_MESSAGE_RECEIVED.call(msg.type, msg.data);
+                }
+                if(pMsg instanceof ChatMessage msg){
+                    //todo: message event
+                    server.broadcast(msg);
                 }
             }
             try {

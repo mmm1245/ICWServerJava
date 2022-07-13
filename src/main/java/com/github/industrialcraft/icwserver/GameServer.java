@@ -11,9 +11,7 @@ import com.github.industrialcraft.icwserver.script.JSGameServer;
 import com.github.industrialcraft.icwserver.script.JSWorld;
 import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.script.event.Events;
-import com.github.industrialcraft.icwserver.util.CommandManager;
-import com.github.industrialcraft.icwserver.util.Location;
-import com.github.industrialcraft.icwserver.util.Pair;
+import com.github.industrialcraft.icwserver.util.*;
 import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.*;
@@ -37,6 +35,7 @@ public class GameServer extends Thread{
     protected ScriptingManager scriptingManager;
     protected long ticksLasted;
     protected CommandManager commandManager;
+    protected final TickManager tickManager;
     public GameServer(InetSocketAddress address, File[] files) {
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
@@ -54,6 +53,10 @@ public class GameServer extends Thread{
 
         getEvents().START_SERVER.call();
         this.commandManager = new CommandManager();
+        this.tickManager = new TickManager();
+    }
+    public TickManager getTickManager() {
+        return tickManager;
     }
     public World createWorld(){
         World world = new World(false, this);
@@ -76,15 +79,33 @@ public class GameServer extends Thread{
         return null;
     }
 
+    public PlayerEntity playerByName(String name){
+        for(ClientConnection connection : getWSServer().getClientConnections()){
+            if(connection.player == null || connection.profile == null)
+                continue;
+            if(connection.profile.name().equals(name)){
+                return connection.player;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void run() {
         server.start();
         while(true) {
             this.worlds.removeIf(world -> world.isRemoved());
-            getEvents().SERVER_TICK.call();
-            for (World world : this.worlds) {
-                getEvents().WORLD_TICK.call(world);
-                world.tick();
+
+            if(tickManager.shouldTick()) {
+                getEvents().SERVER_TICK.call();
+                for (World world : this.worlds) {
+                    getEvents().WORLD_TICK.call(world);
+                    world.tick();
+                }
+            } else {
+                for (World world : this.worlds) {
+                    world.partialTick();
+                }
             }
             for (World world : this.worlds){
                 this.server.broadcastInWorld(new MapDataMessage(world), world);
@@ -104,7 +125,14 @@ public class GameServer extends Thread{
                         connection.disconnect("already logged in");
                         continue;
                     }
-                    //todo: check player names
+                    if(!Util.isPlayerNameValid(msg.username)){
+                        connection.disconnect("invalid username");
+                        continue;
+                    }
+                    if(playerByName(msg.username) != null){
+                        connection.disconnect("username taken");
+                        continue;
+                    }
                     PlayerEntity pl = new PlayerEntity(getLobby().getSpawn(), connection);
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
@@ -135,6 +163,11 @@ public class GameServer extends Thread{
                     }
                 }
                 if(pMsg instanceof PlayerClickSlotMessage msg){
+                    if (msg.slot == -1 && msg.secondInventory == false && connection.player.getHandItemStack() != null) {
+                        new ItemStackEntity(connection.player.getLocation(), connection.player.getHandItemStack().clone());
+                        connection.player.setHandItemStack(null);
+                        continue;
+                    }
                     Inventory inv = msg.secondInventory?connection.player.getOpenedInventory():connection.player.getInventory();
                     if(inv==null)
                         continue;
@@ -168,13 +201,21 @@ public class GameServer extends Thread{
                     }
                 }
             }
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+            if(tickManager.shouldTick())
+                this.ticksLasted++;
+
+            if(tickManager.getWarpTime() > 0){
+                tickManager.decreaseWarpTime();
+                if(tickManager.getWarpTime() == 0)
+                    getWSServer().broadcast(new ChatMessage("Tick warp complete"));
+            } else {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
-            this.ticksLasted++;
         }
     }
     public long ticksLasted() {

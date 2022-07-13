@@ -40,6 +40,16 @@ public class World {
             entity.tick();
         }
     }
+    public void partialTick(){
+        entities.addAll(entitiesToAdd);
+        entitiesToAdd.clear();
+        entities.forEach(entity -> {
+            if(entity.isDead())
+                entity.onDeath();
+        });
+        entities.removeIf(entity -> entity.isDead()||entity.getLocation().world()!=this);
+        particles.removeIf(particle -> particle.decreaseLifetime(1));
+    }
     public void addEntity(Entity entity){
         this.entitiesToAdd.add(entity);
     }

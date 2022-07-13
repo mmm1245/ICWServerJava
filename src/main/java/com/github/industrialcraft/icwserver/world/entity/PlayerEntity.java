@@ -125,6 +125,7 @@ public class PlayerEntity extends Entity {
     }
     public void removeConnection(){
         this.connection.player = null;
+        this.connection.profile = null;
         this.connection = null;
     }
 }

@@ -18,6 +18,9 @@ public class JSGameServer {
     public long ticksLasted() {
         return gameServer.ticksLasted();
     }
+    public PlayerEntity playerByName(String name){
+        return gameServer.playerByName(name);
+    }
     public JSWorld createWorld(){
         return new JSWorld(this.gameServer.createWorld());
     }

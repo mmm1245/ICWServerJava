@@ -197,7 +197,7 @@ public class GameServer extends Thread{
                         commandManager.execute(connection.player, msg.text.substring(1));
                     } else {
                         //todo: message event
-                        server.broadcast(msg);
+                        server.broadcast(new ChatMessage(String.format("<%s>%s", connection.profile.name(), msg.text)));
                     }
                 }
             }

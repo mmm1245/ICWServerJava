@@ -11,6 +11,7 @@ import com.github.industrialcraft.icwserver.script.JSGameServer;
 import com.github.industrialcraft.icwserver.script.JSWorld;
 import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.script.event.Events;
+import com.github.industrialcraft.icwserver.util.CommandManager;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.util.Pair;
 import com.github.industrialcraft.icwserver.world.Particle;
@@ -35,6 +36,7 @@ public class GameServer extends Thread{
     protected int worldIdGenerator;
     protected ScriptingManager scriptingManager;
     protected long ticksLasted;
+    protected CommandManager commandManager;
     public GameServer(InetSocketAddress address, File[] files) {
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
@@ -51,6 +53,7 @@ public class GameServer extends Thread{
         new WoodWorkingStation(new Location(50, 0, worlds.get(0)));
 
         getEvents().START_SERVER.call();
+        this.commandManager = new CommandManager();
     }
     public World createWorld(){
         World world = new World(false, this);
@@ -61,6 +64,16 @@ public class GameServer extends Thread{
 
     public WSServer getWSServer() {
         return server;
+    }
+
+    public Entity entityById(int id){
+        for(World world : worlds){
+            for(Entity entity : world.getEntities()){
+                if(entity.id == id)
+                    return entity;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -145,8 +158,14 @@ public class GameServer extends Thread{
                     getEvents().CUSTOM_MESSAGE_RECEIVED.call(msg.type, msg.data);
                 }
                 if(pMsg instanceof ChatMessage msg){
-                    //todo: message event
-                    server.broadcast(msg);
+                    if(msg.text.isEmpty())
+                        continue;
+                    if(msg.text.charAt(0) == '/'){
+                        commandManager.execute(connection.player, msg.text.substring(1));
+                    } else {
+                        //todo: message event
+                        server.broadcast(msg);
+                    }
                 }
             }
             try {

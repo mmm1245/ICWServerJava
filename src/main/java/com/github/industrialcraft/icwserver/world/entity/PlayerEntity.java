@@ -1,6 +1,7 @@
 package com.github.industrialcraft.icwserver.world.entity;
 
 import com.github.industrialcraft.icwserver.net.ClientConnection;
+import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
 import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
@@ -33,6 +34,11 @@ public class PlayerEntity extends Entity {
     public void tick() {
         if(openedInventory != null && (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50))
             openedInventory = null;
+    }
+
+    public void sendChatMessage(String text){
+        if(connection != null)
+            connection.send(new ChatMessage(text));
     }
 
     public void openInventory(Entity entity){

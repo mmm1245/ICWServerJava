@@ -1,6 +1,7 @@
 package com.github.industrialcraft.icwserver.script;
 
 import com.github.industrialcraft.icwserver.net.Message;
+import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.net.messages.CustomDataMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
@@ -61,5 +62,8 @@ public class JSPlayer {
     }
     public void sendCustomMessage(String type, String data){
         player.getConnection().send(new CustomDataMessage(type, data));
+    }
+    public void sendChatMessage(String text){
+        player.sendChatMessage(text);
     }
 }

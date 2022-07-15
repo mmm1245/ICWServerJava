@@ -39,13 +39,13 @@ events.CREATE_WORLD.register((function(world) {
     entities.ORB.spawn(world.spawnpoint(), {cnt:0});
 }));
 
-var taskid = scheduler.schedule((function() {
-    log.info("task called after 2 sec");
-}),40,null);
+var taskid = scheduler.repeating((function() {
+    log.info("task called every 2 sec");
+}),0,40,null);
 log.info("task id is %s", taskid);
 
 var taskid2 = scheduler.schedule((function() {
     log.info("task called after 4 sec");
 }),80,null);
-scheduler.killTask(taskid);
+//scheduler.killTask(taskid);
 log.info("task2 id is %s", taskid2);

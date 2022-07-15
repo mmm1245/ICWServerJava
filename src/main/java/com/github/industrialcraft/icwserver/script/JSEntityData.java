@@ -32,7 +32,7 @@ public class JSEntityData {
         this.inventoryCreationData = inventoryCreationData;
     }
 
-    public void spawn(JSLocation location){
-        new EntityFromJS(this, location.getInternal());
+    public void spawn(JSLocation location, Object data){
+        new EntityFromJS(this, location.getInternal(), data);
     }
 }

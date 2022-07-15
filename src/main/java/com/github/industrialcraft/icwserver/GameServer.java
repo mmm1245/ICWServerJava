@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class GameServer extends Thread{
+    protected ArrayList<World> worldsToAdd;
     protected final WSServer server;
     protected final ArrayList<World> worlds;
     protected int entityIdGenerator;
@@ -40,6 +41,7 @@ public class GameServer extends Thread{
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
         this.worlds = new ArrayList<>();
+        this.worldsToAdd = new ArrayList<>();
         this.entityIdGenerator = 0;
         this.worldIdGenerator = 0;
         this.ticksLasted = 0;
@@ -60,7 +62,7 @@ public class GameServer extends Thread{
     }
     public World createWorld(){
         World world = new World(false, this);
-        this.worlds.add(world);
+        this.worldsToAdd.add(world);
         getEvents().CREATE_WORLD.call(new JSWorld(world));
         return world;
     }
@@ -94,6 +96,8 @@ public class GameServer extends Thread{
     public void run() {
         server.start();
         while(true) {
+            this.worlds.addAll(worldsToAdd);
+            worldsToAdd.clear();
             this.worlds.removeIf(world -> world.isRemoved());
 
             if(tickManager.shouldTick()) {
@@ -136,7 +140,6 @@ public class GameServer extends Thread{
                     PlayerEntity pl = new PlayerEntity(getLobby().getSpawn(), connection);
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
-                    connection.send(new ControllingEntityMessage(pl));
                     getEvents().PLAYER_JOIN.call(pl);
                     continue;
                 }

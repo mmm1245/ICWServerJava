@@ -12,66 +12,67 @@ import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
 
 public class EntityFromJS extends Entity {
-    private JSEntityData data;
+    private JSEntityData entitiyData;
     private PhysicsObject physicsObject;
     private Inventory inventory;
-    public EntityFromJS(JSEntityData data, Location location) {
+    public EntityFromJS(JSEntityData entitiyData, Location location, Object data) {
         super(location);
-        this.data = data;
-        if(data.physicsData!=null)
-            this.physicsObject = data.physicsData.create(this);
+        this.entitiyData = entitiyData;
+        if(entitiyData.physicsData!=null)
+            this.physicsObject = entitiyData.physicsData.create(this);
         this.setHealth(getMaxHealth());
-        this.inventory = data.inventoryCreationData==null?null:data.inventoryCreationData.create((inventory1, is) -> {
+        this.inventory = entitiyData.inventoryCreationData==null?null:entitiyData.inventoryCreationData.create((inventory1, is) -> {
             EntityFromJS ent = inventory1.getData();
             if(!ent.isDead()){
                 new ItemStackEntity(ent.getLocation(), is);
             }
         }, this);
-        if(data.spawnMethod != null)
-            data.spawnMethod.call(this);
+        this.data = data;
+        if(entitiyData.spawnMethod != null)
+            entitiyData.spawnMethod.call(this);
     }
 
     @Override
     public void tick() {
-        if(data.tickMethod != null)
-            data.tickMethod.call(this);
+        if(entitiyData.tickMethod != null)
+            entitiyData.tickMethod.call(this);
     }
     @Override
     public void onDeath() {
-        if(data.onDeathMethod != null)
-            data.onDeathMethod.call(this);
+        if(entitiyData.onDeathMethod != null)
+            entitiyData.onDeathMethod.call(this);
         if(inventory != null)
             inventory.dropAll();
     }
     @Override
     public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
-        if(data.onPlayerInteractMethod != null){
-            data.onPlayerInteractMethod.call(this, player, message);
+        if(entitiyData.onPlayerInteractMethod != null){
+            entitiyData.onPlayerInteractMethod.call(this, player, message);
             return true;
         }
         return false;
     }
     @Override
     public float getDamageTypeModifier(EDamageType type) {
-        if(data.damageTypeModifierMethod != null){
-            return ((Float)data.damageTypeModifierMethod.call(this, type));
+        if(entitiyData.damageTypeModifierMethod != null){
+            return Float.parseFloat(entitiyData.damageTypeModifierMethod.call(this, type).toString());
         }
         return 1;
     }
     @Override
     public JsonObject toJson() {
         JsonObject json = super.toJson();
-        if(data.animationStateProvider != null)
-            json.addProperty("state", data.animationStateProvider.call(this).toString());
+        if(entitiyData.animationStateProvider != null)
+            json.addProperty("state", entitiyData.animationStateProvider.call(this).toString());
         return json;
     }
     @Override
     public String getType() {
-        return data.type;
+        return entitiyData.type;
     }
     @Override
     public float getMaxHealth() {
-        return data==null?1:data.maxHealth;
+        return entitiyData==null?1:entitiyData.maxHealth;
     }
 
     @Override

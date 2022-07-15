@@ -12,7 +12,7 @@ stone.register();
 
 var orb = entityRegistry.createTemplate("ORB", 20);
 orb.withOnSpawn((function() {
-    this.data = {cnt:0};
+    //this.data = {cnt:0};
 }));
 orb.withOnTick((function() {
    this.data.cnt++;
@@ -36,5 +36,5 @@ events.PLAYER_JOIN.register((function(pl) {
 
 events.CREATE_WORLD.register((function(world) {
     log.info(entities);
-    entities.ORB.spawn(world.spawnpoint());
+    entities.ORB.spawn(world.spawnpoint(), {cnt:0});
 }));

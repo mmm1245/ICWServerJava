@@ -17,14 +17,6 @@ public class PlatformEntity extends Entity {
     public void tick() {}
 
     @Override
-    public JsonObject toJson() {
-        JsonObject json = super.toJson();
-        json.addProperty("width", physicsObject.getHitboxW());
-        json.addProperty("height", physicsObject.getHitboxH());
-        return json;
-    }
-
-    @Override
     public String getType() {
         return "platform";
     }

@@ -3,6 +3,7 @@ package com.github.industrialcraft.icwserver.world.entity;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
+import com.github.industrialcraft.icwserver.net.messages.ControllerDataMessage;
 import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
@@ -17,6 +18,7 @@ public class PlayerEntity extends Entity {
     private Inventory inventory;
     private Entity openedInventory;
     private ItemStack handItemStack;
+    private PlayerAbilities playerAbilities;
     public PlayerEntity(Location location, ClientConnection connection) {
         super(location);
         this.connection = connection;
@@ -29,16 +31,26 @@ public class PlayerEntity extends Entity {
                 new ItemStackEntity(pl.getLocation(), is);
             }
         }, this);
+
+        this.playerAbilities = new PlayerAbilities(2, 3, 5, false, false, false);
     }
     @Override
     public void tick() {
+        if(isDead())
+            return;
         if(openedInventory != null && (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50))
             openedInventory = null;
+
+        connection.send(this.playerAbilities.createControllerMessage(this));
     }
 
     public void sendChatMessage(String text){
         if(connection != null)
             connection.send(new ChatMessage(text));
+    }
+
+    public PlayerAbilities getPlayerAbilities() {
+        return playerAbilities;
     }
 
     public void openInventory(Entity entity){

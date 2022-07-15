@@ -1,11 +1,19 @@
 package com.github.industrialcraft.icwserver.script;
 
+import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.script.event.Events;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import org.openjdk.nashorn.internal.objects.Global;
+import org.openjdk.nashorn.internal.parser.JSONParser;
+import org.openjdk.nashorn.internal.runtime.Context;
+import org.openjdk.nashorn.internal.runtime.JSONFunctions;
 
 import javax.script.*;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class ScriptingManager {
     private NashornScriptEngineFactory manager;
@@ -16,7 +24,7 @@ public class ScriptingManager {
     public final JSEntityRegistry entityRegistry;
     public final JSGameServer gameServer;
     public final Events events;
-    public ScriptingManager(JSGameServer gameServer, boolean debugEnabled) {
+    public ScriptingManager(JSGameServer gameServer, boolean debugEnabled)  {
         this.gameServer = gameServer;
         this.manager = new NashornScriptEngineFactory();
         this.engine = manager.getScriptEngine(className -> false);
@@ -37,7 +45,12 @@ public class ScriptingManager {
 
         this.binding.put("events", this.events);
 
+        this.binding.put("EPhysicsLayers", Arrays.stream(EPhysicsLayer.values()).collect(Collectors.toUnmodifiableMap(o -> o.name(), o -> o)));
+
         this.engine.setBindings(this.binding, ScriptContext.GLOBAL_SCOPE);
+    }
+    public ScriptEngine getEngine() {
+        return engine;
     }
     public void runScripts(File... scripts){
         for(File file : scripts){

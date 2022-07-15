@@ -17,12 +17,14 @@ public abstract class Entity implements IKillable, IJsonSerializable {
     protected float health;
     public final int id;
     public Object data;
+    public boolean frozen;
     public Entity(Location location) {
         this.location = location;
         this.dead = false;
         this.location.world().addEntity(this);
         this.health = getMaxHealth();
         this.id = location.world().getServer().generateIDEntity();
+        this.frozen = false;
     }
 
     public GameServer getServer(){
@@ -52,6 +54,11 @@ public abstract class Entity implements IKillable, IJsonSerializable {
         json.addProperty("y", location.y());
         json.addProperty("type", getType());
         json.addProperty("health", health);
+        if(getPhysicalObject() != null){
+            json.addProperty("width", getPhysicalObject().getHitboxW());
+            json.addProperty("height", getPhysicalObject().getHitboxH());
+            json.addProperty("physicsLayer", getPhysicalObject().getLayer().name());
+        }
         return json;
     }
 

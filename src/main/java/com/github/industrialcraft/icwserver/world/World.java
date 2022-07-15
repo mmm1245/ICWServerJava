@@ -28,16 +28,10 @@ public class World {
         this.particles = new ArrayList<>();
     }
     public void tick(){
-        entities.addAll(entitiesToAdd);
-        entitiesToAdd.clear();
-        entities.forEach(entity -> {
-            if(entity.isDead())
-                entity.onDeath();
-        });
-        entities.removeIf(entity -> entity.isDead()||entity.getLocation().world()!=this);
-        particles.removeIf(particle -> particle.decreaseLifetime(1));
+        partialTick();
         for(Entity entity : this.entities){
-            entity.tick();
+            if(!entity.frozen)
+                entity.tick();
         }
     }
     public void partialTick(){

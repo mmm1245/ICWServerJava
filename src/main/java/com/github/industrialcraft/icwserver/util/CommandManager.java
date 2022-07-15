@@ -2,20 +2,28 @@ package com.github.industrialcraft.icwserver.util;
 
 import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
+import com.github.industrialcraft.icwserver.script.JSEntityData;
+import com.github.industrialcraft.icwserver.script.JSLocation;
+import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
+import org.openjdk.nashorn.internal.parser.JSONParser;
+import org.openjdk.nashorn.internal.runtime.Context;
+
+import javax.script.Invocable;
+import javax.script.ScriptException;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
-import static com.mojang.brigadier.arguments.StringArgumentType.string;
-import static com.mojang.brigadier.arguments.StringArgumentType.getString;
+import static com.mojang.brigadier.arguments.StringArgumentType.*;
 import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
 import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
 
@@ -88,6 +96,83 @@ public class CommandManager {
                     context.getSource().getServer().getWSServer().broadcast(new ChatMessage(String.format("Tick warping %s ticks", getInteger(context, "time"))));
                     return 1;
                 })))
+        );
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("kill")
+                .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer()).executes(context -> {
+                    Entity entity = context.getSource().getServer().entityById(getInteger(context, "id"));
+                    if(entity == null){
+                        context.getSource().sendChatMessage("Entity not found");
+                    } else {
+                        entity.kill();
+                        context.getSource().sendChatMessage("Entity killed");
+                    }
+                    return 1;
+                }))
+        );
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("createworld").executes(context -> {
+            World world = context.getSource().getServer().createWorld();
+            context.getSource().sendChatMessage(String.format("World created with id %s", world.getId()));
+            return 1;
+        }));
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("killworld")
+            .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer()).executes(context -> {
+                World world = context.getSource().getServer().worldById(getInteger(context, "id"));
+                world.remove();
+                if(world == null){
+                    context.getSource().sendChatMessage("World not found");
+                } else {
+                    context.getSource().sendChatMessage(String.format("World with id %s removed", world.getId()));
+                }
+                return 1;
+        })));
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("spawn")
+                .then(RequiredArgumentBuilder.<PlayerEntity,String>argument("type", word())
+                .then(RequiredArgumentBuilder.<PlayerEntity,String>argument("data", greedyString())
+                .executes(context -> {
+                    ScriptingManager scriptingManager = context.getSource().getServer().getScriptingManager();
+                    JSEntityData entityData = scriptingManager.entityRegistry.getEntities().get(getString(context, "type"));
+                    if(entityData == null){
+                        context.getSource().sendChatMessage("Entity type not found");
+                        return 1;
+                    }
+                    try {
+                        Object data = scriptingManager.getEngine().eval("(" + getString(context, "data") + ")");
+                        entityData.spawn(new JSLocation(context.getSource().getLocation()), data);
+                    } catch (ScriptException e) {
+                        context.getSource().sendChatMessage("Invalid data for entity spawn: " + e.getMessage());
+                    }
+                    return 1;
+            })))
+        );
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("noclip").executes(context -> {
+            context.getSource().getPlayerAbilities().toggleNoClip();
+            context.getSource().sendChatMessage("Toggled noclip " + (context.getSource().getPlayerAbilities().noClip?"ON":"OFF"));
+            return 1;
+        }));
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("fly").executes(context -> {
+            context.getSource().getPlayerAbilities().toggleTopDown();
+            context.getSource().sendChatMessage("Toggled fly " + (context.getSource().getPlayerAbilities().topDown?"ON":"OFF"));
+            return 1;
+        }));
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("freeze")
+                .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer()).executes(context -> {
+                    Entity entity = context.getSource().getServer().entityById(getInteger(context, "id"));
+                    if(entity != null) {
+                        if(entity instanceof PlayerEntity player){
+                            player.getPlayerAbilities().toggleFrozen();
+                            context.getSource().sendChatMessage("Player is now " + (player.getPlayerAbilities().frozen?"frozen":"unfrozen"));
+                        } else {
+                            entity.frozen = !entity.frozen;
+                            context.getSource().sendChatMessage("Entity is now " + (entity.frozen?"frozen":"unfrozen"));
+                        }
+                    } else
+                        context.getSource().sendChatMessage("Entity not found");
+                    return 1;
+                })).executes(context -> {
+                    context.getSource().getPlayerAbilities().toggleFrozen();
+                    context.getSource().sendChatMessage("You are now " + (context.getSource().getPlayerAbilities().frozen?"frozen":"unfrozen"));
+                    return 1;
+                })
         );
     }
     public void execute(PlayerEntity player, String text){

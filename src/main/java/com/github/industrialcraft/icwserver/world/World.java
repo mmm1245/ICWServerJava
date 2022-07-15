@@ -62,9 +62,9 @@ public class World {
     public Location getSpawn(){
         return new Location(0, 0, this);
     }
-    public void remove(){
+    public boolean remove(){
         if(lobby)
-            return;
+            return false;
         this.removed = true;
         Location spawn = this.server.getLobby().getSpawn();
         for(Entity entity : this.entities){
@@ -72,6 +72,7 @@ public class World {
                 entity.teleport(spawn);
         }
         this.entities.clear();
+        return true;
     }
     public List<Entity> getEntities(){
         return Collections.unmodifiableList(this.entities);

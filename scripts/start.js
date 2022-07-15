@@ -38,3 +38,14 @@ events.CREATE_WORLD.register((function(world) {
     log.info(entities);
     entities.ORB.spawn(world.spawnpoint(), {cnt:0});
 }));
+
+var taskid = scheduler.schedule((function() {
+    log.info("task called after 2 sec");
+}),40,null);
+log.info("task id is %s", taskid);
+
+var taskid2 = scheduler.schedule((function() {
+    log.info("task called after 4 sec");
+}),80,null);
+scheduler.killTask(taskid);
+log.info("task2 id is %s", taskid2);

@@ -8,14 +8,12 @@ public class PlayerAbilities {
     public int jumpPower;
     public boolean noClip;
     public boolean topDown;
-    public boolean frozen;
-    public PlayerAbilities(int speed, int gravity, int jumpPower, boolean noClip, boolean topDown, boolean frozen) {
+    public PlayerAbilities(int speed, int gravity, int jumpPower, boolean noClip, boolean topDown) {
         this.speed = speed;
         this.gravity = gravity;
         this.jumpPower = jumpPower;
         this.noClip = noClip;
         this.topDown = topDown;
-        this.frozen = frozen;
     }
     public void toggleNoClip(){
         this.noClip = !this.noClip;
@@ -23,10 +21,7 @@ public class PlayerAbilities {
     public void toggleTopDown(){
         this.topDown = !this.topDown;
     }
-    public void toggleFrozen(){
-        this.frozen = !this.frozen;
-    }
-    public ControllerDataMessage createControllerMessage(Entity controlling){
+    public ControllerDataMessage createControllerMessage(Entity controlling, boolean frozen){
         return new ControllerDataMessage(controlling, speed, gravity, jumpPower, noClip, topDown, frozen);
     }
 }

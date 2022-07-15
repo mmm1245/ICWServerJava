@@ -37,11 +37,13 @@ public class GameServer extends Thread{
     protected long ticksLasted;
     protected CommandManager commandManager;
     protected final TickManager tickManager;
+    protected Scheduler scheduler;
     public GameServer(InetSocketAddress address, File[] files) {
         this.server = new WSServer(address, this);
         this.server.setReuseAddr(true);
         this.worlds = new ArrayList<>();
         this.worldsToAdd = new ArrayList<>();
+        this.scheduler = new Scheduler();
         this.entityIdGenerator = 0;
         this.worldIdGenerator = 0;
         this.ticksLasted = 0;
@@ -50,7 +52,6 @@ public class GameServer extends Thread{
         this.worlds.add(new World(true, this));
         getEvents().CREATE_WORLD.call(new JSWorld(this.worlds.get(0)));
 
-        new PlatformEntity(new Location(0, -30, worlds.get(0)), 100, 5);
         new WoodWorkingStation(new Location(50, 0, worlds.get(0)));
 
         getEvents().START_SERVER.call();
@@ -101,6 +102,8 @@ public class GameServer extends Thread{
             this.worlds.removeIf(world -> world.isRemoved());
 
             if(tickManager.shouldTick()) {
+                scheduler.tick();
+
                 getEvents().SERVER_TICK.call();
                 for (World world : this.worlds) {
                     getEvents().WORLD_TICK.call(world);
@@ -115,8 +118,10 @@ public class GameServer extends Thread{
                 this.server.broadcastInWorld(new MapDataMessage(world), world);
             }
             for(ClientConnection connection : this.server.getClientConnections()){
-                if(connection.player != null)
+                if(connection.player != null) {
                     connection.send(new PlayerInventoryMessage(connection.player.getInventory(), connection.player.getOpenedInventory(), connection.player.getHandItemStack(), connection.player.getHealth()));
+                    connection.send(connection.player.getPlayerAbilities().createControllerMessage(connection.player, connection.player.frozen));
+                }
             }
             while(server.hasMessage()){
                 Pair<ClientConnection,Message> polled = server.pollMessage();
@@ -221,6 +226,11 @@ public class GameServer extends Thread{
             }
         }
     }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
     public long ticksLasted() {
         return ticksLasted;
     }

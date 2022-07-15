@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JSGameServer {
-    GameServer gameServer;
+    private GameServer gameServer;
     public JSGameServer(GameServer server){
         this.gameServer = server;
     }
@@ -47,5 +47,9 @@ public class JSGameServer {
                 .filter(player -> player != null)
                 .map(player -> new JSPlayer(player))
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public GameServer getInternal(){
+        return this.gameServer;
     }
 }

@@ -45,9 +45,19 @@ public class ScriptingManager {
 
         this.binding.put("events", this.events);
 
+        this.binding.put("scheduler", this.gameServer.getInternal().getScheduler());
+
         this.binding.put("EPhysicsLayers", Arrays.stream(EPhysicsLayer.values()).collect(Collectors.toUnmodifiableMap(o -> o.name(), o -> o)));
 
         this.engine.setBindings(this.binding, ScriptContext.GLOBAL_SCOPE);
+
+        try {
+            JSUtilFunctions.defineObjectAssign(this.engine);
+            JSUtilFunctions.defineEntityDataMerge(this.engine);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
     public ScriptEngine getEngine() {
         return engine;

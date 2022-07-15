@@ -32,16 +32,12 @@ public class PlayerEntity extends Entity {
             }
         }, this);
 
-        this.playerAbilities = new PlayerAbilities(2, 3, 5, false, false, false);
+        this.playerAbilities = new PlayerAbilities(2, 3, 5, false, false);
     }
     @Override
     public void tick() {
-        if(isDead())
-            return;
-        if(openedInventory != null && (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50))
+        if(openedInventory != null && (openedInventory.isDead() || (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50)))
             openedInventory = null;
-
-        connection.send(this.playerAbilities.createControllerMessage(this));
     }
 
     public void sendChatMessage(String text){

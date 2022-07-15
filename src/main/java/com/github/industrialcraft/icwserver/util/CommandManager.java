@@ -8,6 +8,7 @@ import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import com.github.industrialcraft.icwserver.world.entity.js.EntityFromJS;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -117,11 +118,14 @@ public class CommandManager {
         this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("killworld")
             .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer()).executes(context -> {
                 World world = context.getSource().getServer().worldById(getInteger(context, "id"));
-                world.remove();
                 if(world == null){
                     context.getSource().sendChatMessage("World not found");
                 } else {
-                    context.getSource().sendChatMessage(String.format("World with id %s removed", world.getId()));
+                    if(world.remove()) {
+                        context.getSource().sendChatMessage(String.format("World with id %s removed", world.getId()));
+                    } else {
+                        context.getSource().sendChatMessage("Unable to remove world(lobbies cannot be removed)");
+                    }
                 }
                 return 1;
         })));
@@ -158,22 +162,38 @@ public class CommandManager {
                 .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer()).executes(context -> {
                     Entity entity = context.getSource().getServer().entityById(getInteger(context, "id"));
                     if(entity != null) {
-                        if(entity instanceof PlayerEntity player){
-                            player.getPlayerAbilities().toggleFrozen();
-                            context.getSource().sendChatMessage("Player is now " + (player.getPlayerAbilities().frozen?"frozen":"unfrozen"));
-                        } else {
-                            entity.frozen = !entity.frozen;
-                            context.getSource().sendChatMessage("Entity is now " + (entity.frozen?"frozen":"unfrozen"));
-                        }
+                        entity.frozen = !entity.frozen;
+                        context.getSource().sendChatMessage("Entity is now " + (entity.frozen?"frozen":"unfrozen"));
                     } else
                         context.getSource().sendChatMessage("Entity not found");
                     return 1;
                 })).executes(context -> {
-                    context.getSource().getPlayerAbilities().toggleFrozen();
-                    context.getSource().sendChatMessage("You are now " + (context.getSource().getPlayerAbilities().frozen?"frozen":"unfrozen"));
+                    context.getSource().frozen = !context.getSource().frozen;
+                    context.getSource().sendChatMessage("You are now " + (context.getSource().frozen?"frozen":"unfrozen"));
                     return 1;
                 })
         );
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("data")
+            .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer())
+            .then(RequiredArgumentBuilder.<PlayerEntity,String>argument("data", greedyString()).executes(context -> {
+                Entity entity = context.getSource().getServer().entityById(getInteger(context, "id"));
+                ScriptingManager scriptingManager = context.getSource().getServer().getScriptingManager();
+                if(entity != null) {
+                    if(entity instanceof EntityFromJS entityFromJS) {
+                        try {
+                            Object data = scriptingManager.getEngine().eval("(" + getString(context, "data") + ")");
+                            ((Invocable)scriptingManager.getEngine()).invokeFunction("mergeEntityData", entity, data);
+                        } catch (ScriptException | NoSuchMethodException e) {
+                            context.getSource().sendChatMessage("Invalid data for entity modification: " + e.getMessage());
+                        }
+                    } else {
+                        context.getSource().sendChatMessage("You can only manipulate data belonging to EntityFromJS");
+                    }
+                } else {
+                    context.getSource().sendChatMessage("Entity not found");
+                }
+                return 1;
+        }))));
     }
     public void execute(PlayerEntity player, String text){
         try {

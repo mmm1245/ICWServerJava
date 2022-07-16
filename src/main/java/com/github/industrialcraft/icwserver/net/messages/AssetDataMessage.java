@@ -5,8 +5,8 @@ import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.script.JSEntityData;
 import com.github.industrialcraft.icwserver.script.JSEntityRegistry;
 import com.github.industrialcraft.icwserver.script.JSItemRegistry;
-import com.github.industrialcraft.icwserver.world.entity.Entity;
-import com.google.gson.JsonArray;
+import com.github.industrialcraft.icwserver.script.JSTauntRegistry;
+import com.github.industrialcraft.icwserver.util.taunt.Taunt;
 import com.google.gson.JsonObject;
 
 public class AssetDataMessage extends Message {
@@ -14,9 +14,11 @@ public class AssetDataMessage extends Message {
 
     public final JSEntityRegistry entityRegistry;
     public final JSItemRegistry itemRegistry;
-    public AssetDataMessage(JSEntityRegistry entityRegistry, JSItemRegistry itemRegistry) {
+    public final JSTauntRegistry tauntRegistry;
+    public AssetDataMessage(JSEntityRegistry entityRegistry, JSItemRegistry itemRegistry, JSTauntRegistry tauntRegistry) {
         this.entityRegistry = entityRegistry;
         this.itemRegistry = itemRegistry;
+        this.tauntRegistry = tauntRegistry;
     }
     @Override
     public JsonObject toJson() {
@@ -26,11 +28,21 @@ public class AssetDataMessage extends Message {
             jsonEntities.add(entity.type, entity.state2AssetStorage.toJson());
         }
         json.add("entities", jsonEntities);
+
         JsonObject jsonItems = new JsonObject();
         for(Item item : itemRegistry.getItems().values()){
             jsonItems.add(item.getIdentifier(), item.state2AssetStorage.toJson());
         }
         json.add("items", jsonItems);
+
+        JsonObject jsonPlayerStates = new JsonObject();
+        for(Taunt taunt : tauntRegistry.getTaunts().values()){
+            for(int i = 0;i < taunt.parts.size();i++){
+                jsonPlayerStates.addProperty(taunt.id + "_" + i, taunt.parts.get(i).asset());
+            }
+        }
+        jsonPlayerStates.addProperty("default", "default_player.png");
+        json.add("playerStates", jsonPlayerStates);
         return json;
     }
     @Override

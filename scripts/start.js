@@ -39,7 +39,7 @@ events.CREATE_WORLD.register((function(world) {
     entities.ORB.spawn(world.spawnpoint(), {cnt:0});
 }));
 
-var taskid = scheduler.repeating((function() {
+/*var taskid = scheduler.repeating((function() {
     log.info("task called every 2 sec");
 }),0,40,null);
 log.info("task id is %s", taskid);
@@ -47,5 +47,11 @@ log.info("task id is %s", taskid);
 var taskid2 = scheduler.schedule((function() {
     log.info("task called after 4 sec");
 }),80,null);
-//scheduler.killTask(taskid);
 log.info("task2 id is %s", taskid2);
+var taskid3 = scheduler.times((function() {
+    log.info("task called after 2 sec,every 2 sec, 3 times");
+}),40,40,3,null);
+log.info("task3 id is %s", taskid3);*/
+//scheduler.killTask(taskid);
+
+tauntRegistry.createTemplate("WIN").addPart("assets/taunts/win/win_1.png", 20).addPart("assets/taunts/win/win_2.png",10).register();

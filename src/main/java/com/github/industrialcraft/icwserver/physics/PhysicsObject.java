@@ -9,7 +9,7 @@ public class PhysicsObject {
     protected float hitboxW;
     protected float hitboxH;
     protected final EPhysicsLayer layer;
-    public PhysicsObject(Entity entity, int hitboxW, int hitboxH, EPhysicsLayer layer) {
+    public PhysicsObject(Entity entity, float hitboxW, float hitboxH, EPhysicsLayer layer) {
         this.entity = entity;
         this.hitboxW = hitboxW;
         this.hitboxH = hitboxH;
@@ -63,6 +63,9 @@ public class PhysicsObject {
         if(layer1==EPhysicsLayer.TRANSPARENT||layer2==EPhysicsLayer.TRANSPARENT)
             return false;
         return layer1==EPhysicsLayer.WALL||layer2==EPhysicsLayer.WALL;
+    }
+    public PhysicsObject clone(Entity entity){
+        return new PhysicsObject(entity, hitboxW, hitboxH, layer);
     }
     public Entity getEntity() {
         return entity;

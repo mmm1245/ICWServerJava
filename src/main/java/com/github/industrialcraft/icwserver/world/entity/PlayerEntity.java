@@ -3,11 +3,14 @@ package com.github.industrialcraft.icwserver.world.entity;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
-import com.github.industrialcraft.icwserver.net.messages.ControllerDataMessage;
 import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
+import com.github.industrialcraft.icwserver.script.JSPlayer;
+import com.github.industrialcraft.icwserver.script.JSTauntRegistry;
 import com.github.industrialcraft.icwserver.util.Location;
+import com.github.industrialcraft.icwserver.util.taunt.RunningTaunt;
+import com.github.industrialcraft.icwserver.util.taunt.Taunt;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
@@ -19,6 +22,7 @@ public class PlayerEntity extends Entity {
     private Entity openedInventory;
     private ItemStack handItemStack;
     private PlayerAbilities playerAbilities;
+    private RunningTaunt runningTaunt;
     public PlayerEntity(Location location, ClientConnection connection) {
         super(location);
         this.connection = connection;
@@ -33,11 +37,26 @@ public class PlayerEntity extends Entity {
         }, this);
 
         this.playerAbilities = new PlayerAbilities(2, 3, 5, false, false);
+        this.runningTaunt = null;
     }
     @Override
     public void tick() {
         if(openedInventory != null && (openedInventory.isDead() || (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50)))
             openedInventory = null;
+
+        if(runningTaunt != null){
+            runningTaunt.next();
+            if(runningTaunt.isFinished())
+                runningTaunt = null;
+        }
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject json = super.toJson();
+        json.addProperty("name", connection.profile.name());
+        json.addProperty("state", runningTaunt==null?"default":runningTaunt.getState());
+        return json;
     }
 
     public void sendChatMessage(String text){
@@ -47,6 +66,13 @@ public class PlayerEntity extends Entity {
 
     public PlayerAbilities getPlayerAbilities() {
         return playerAbilities;
+    }
+
+    public void startTaunt(Taunt taunt){
+        this.runningTaunt = new RunningTaunt(taunt);
+    }
+    public void stopTaunt(){
+        this.runningTaunt = null;
     }
 
     public void openInventory(Entity entity){
@@ -79,13 +105,6 @@ public class PlayerEntity extends Entity {
         this.handItemStack = handItemStack;
     }
 
-    @Override
-    public JsonObject toJson() {
-        JsonObject json = super.toJson();
-        json.addProperty("name", connection.profile.name());
-        return json;
-    }
-
     public void setLocationFromClient(ClientPlayerPositionMessage message){
         //todo: anticheat
         this.location = this.location.withXY(message.x, message.y);
@@ -113,6 +132,12 @@ public class PlayerEntity extends Entity {
         teleport(getLocation().world().getServer().getLobby().getSpawn());
         setHealth(getMaxHealth());
     }
+
+    @Override
+    public Entity clone(Location newLocation) {
+        throw new UnsupportedOperationException("cannot clone player");
+    }
+
     @Override
     public boolean isDead() {
         return connection == null;

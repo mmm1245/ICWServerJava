@@ -182,8 +182,10 @@ public class CommandManager {
                     if(entity instanceof EntityFromJS entityFromJS) {
                         try {
                             Object data = scriptingManager.getEngine().eval("(" + getString(context, "data") + ")");
-                            ((Invocable)scriptingManager.getEngine()).invokeFunction("mergeEntityData", entity, data);
-                        } catch (ScriptException | NoSuchMethodException e) {
+                            if(!entityFromJS.modData(data)){
+                                context.getSource().sendChatMessage("Couldnt modify entity");
+                            }
+                        } catch (ScriptException e) {
                             context.getSource().sendChatMessage("Invalid data for entity modification: " + e.getMessage());
                         }
                     } else {
@@ -194,6 +196,30 @@ public class CommandManager {
                 }
                 return 1;
         }))));
+        this.dispatcher.register(LiteralArgumentBuilder.<PlayerEntity>literal("clone")
+            .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("id", integer())
+            .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("x", integer())
+            .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("y", integer())
+            .then(RequiredArgumentBuilder.<PlayerEntity,Integer>argument("w", integer())
+            .executes(context -> {
+                Entity entity = context.getSource().getServer().entityById(getInteger(context, "id"));
+                if(entity == null){
+                    context.getSource().sendChatMessage("Entity not found");
+                    return 1;
+                }
+                World world = context.getSource().getServer().worldById(getInteger(context, "w"));
+                if(world == null){
+                    context.getSource().sendChatMessage("World not found");
+                    return 1;
+                }
+                try {
+                    entity.clone(new Location(getInteger(context, "x"), getInteger(context, "y"), world));
+                } catch (Exception e){
+                    context.getSource().sendChatMessage("Couldnt clone: " + e.getMessage());
+                }
+                return 1;
+            })))))
+        );
     }
     public void execute(PlayerEntity player, String text){
         try {

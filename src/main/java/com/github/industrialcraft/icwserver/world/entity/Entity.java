@@ -105,6 +105,8 @@ public abstract class Entity implements IKillable, IJsonSerializable {
         this.dead = true;
     }
 
+    public abstract Entity clone(Location newLocation);
+
     public PhysicsObject getPhysicalObject() {
         return null;
     }

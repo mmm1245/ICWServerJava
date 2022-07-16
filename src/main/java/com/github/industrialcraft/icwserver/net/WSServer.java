@@ -34,7 +34,7 @@ public class WSServer extends WebSocketServer
         ClientConnection clientConnection = new ClientConnection(conn);
         conn.setAttachment(clientConnection);
         this.connections.add(clientConnection);
-        clientConnection.send(new AssetDataMessage(gameServer.getScriptingManager().entityRegistry, gameServer.getScriptingManager().itemRegistry));
+        clientConnection.send(new AssetDataMessage(gameServer.getScriptingManager().entityRegistry, gameServer.getScriptingManager().itemRegistry, gameServer.getScriptingManager().tauntRegistry));
         System.out.println("new connection");
     }
 

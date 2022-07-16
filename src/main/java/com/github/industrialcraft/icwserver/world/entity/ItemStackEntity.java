@@ -53,4 +53,14 @@ public class ItemStackEntity extends Entity {
         }
         return true;
     }
+
+    @Override
+    public Entity clone(Location newLocation) {
+        ItemStackEntity entity = new ItemStackEntity(newLocation, is.clone());
+        entity.setHealth(getHealth());
+        entity.physicsObject = this.physicsObject.clone(entity);
+        entity.dead = this.dead;
+        entity.frozen = this.frozen;
+        return entity;
+    }
 }

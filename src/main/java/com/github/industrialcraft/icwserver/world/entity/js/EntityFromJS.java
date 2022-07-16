@@ -10,6 +10,10 @@ import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
+
+import javax.script.Invocable;
+import javax.script.ScriptException;
 
 public class EntityFromJS extends Entity {
     private JSEntityData entitiyData;
@@ -32,6 +36,15 @@ public class EntityFromJS extends Entity {
             entitiyData.spawnMethod.call(this);
     }
 
+    public boolean modData(Object data){
+        try {
+            ((Invocable)getServer().getScriptingManager().getEngine()).invokeFunction("mergeEntityData", this, data);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Override
     public void tick() {
         if(entitiyData.tickMethod != null)
@@ -52,6 +65,18 @@ public class EntityFromJS extends Entity {
         }
         return false;
     }
+
+    @Override
+    public Entity clone(Location newLocation) {
+        EntityFromJS entity = new EntityFromJS(this.entitiyData, newLocation, getServer().getScriptingManager().tryDeepCopy(this.data));
+        entity.setHealth(getHealth());
+        entity.physicsObject = this.physicsObject.clone(entity);
+        entity.dead = this.dead;
+        entity.frozen = this.frozen;
+        //todo: copy inventory
+        return entity;
+    }
+
     @Override
     public float getDamageTypeModifier(EDamageType type) {
         if(entitiyData.damageTypeModifierMethod != null){

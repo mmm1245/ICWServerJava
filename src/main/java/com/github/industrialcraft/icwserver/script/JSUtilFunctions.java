@@ -40,4 +40,9 @@ public class JSUtilFunctions {
                 "    entity.data = Object.assign(entity.data, data);\n" +
                 "}");
     }
+    public static void defineDeepCopy(ScriptEngine engine) throws ScriptException {
+        engine.eval("function deepCopyObject(obj){\n" +
+                "    return Object.assign(obj);\n" +
+                "}");
+    }
 }

@@ -27,6 +27,9 @@ public class JSPlayer {
     public float getMaxHealth() {
         return player.getMaxHealth();
     }
+    public JSLocation location(){
+        return new JSLocation(player.getLocation());
+    }
 
     public ItemStack getHandItemStack() {
         return this.player.getHandItemStack();
@@ -69,5 +72,11 @@ public class JSPlayer {
     }
     public PlayerAbilities playerAbilities(){
         return player.getPlayerAbilities();
+    }
+    public int getId(){
+        return player.id;
+    }
+    public PlayerEntity getInternal() {
+        return this.player;
     }
 }

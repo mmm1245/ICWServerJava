@@ -18,6 +18,7 @@ public class World {
     protected final ArrayList<Particle> particles;
     protected final GameServer server;
     protected final int id;
+    public Object data;
     public World(boolean lobby, GameServer server) {
         this.id = server.generateIDWorld();
         this.server = server;

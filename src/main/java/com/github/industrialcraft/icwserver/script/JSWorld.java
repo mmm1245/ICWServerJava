@@ -40,6 +40,13 @@ public class JSWorld {
         return particle;
     }
 
+    public void setData(Object data){
+        world.data = data;
+    }
+    public Object getData(){
+        return world.data;
+    }
+
     public World getInternal(){
         return this.world;
     }

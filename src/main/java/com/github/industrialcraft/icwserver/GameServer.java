@@ -8,6 +8,7 @@ import com.github.industrialcraft.icwserver.net.WSServer;
 import com.github.industrialcraft.icwserver.net.messages.*;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
 import com.github.industrialcraft.icwserver.script.JSGameServer;
+import com.github.industrialcraft.icwserver.script.JSPlayer;
 import com.github.industrialcraft.icwserver.script.JSWorld;
 import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.script.event.Events;
@@ -66,6 +67,10 @@ public class GameServer extends Thread{
         return world;
     }
 
+    public CommandManager getCommandManager() {
+        return commandManager;
+    }
+
     public WSServer getWSServer() {
         return server;
     }
@@ -85,6 +90,16 @@ public class GameServer extends Thread{
             if(connection.player == null || connection.profile == null)
                 continue;
             if(connection.profile.name().equals(name)){
+                return connection.player;
+            }
+        }
+        return null;
+    }
+    public PlayerEntity playerById(int id){
+        for(ClientConnection connection : getWSServer().getClientConnections()){
+            if(connection.player == null)
+                continue;
+            if(connection.player.id == id){
                 return connection.player;
             }
         }
@@ -200,7 +215,7 @@ public class GameServer extends Thread{
                     if(msg.text.isEmpty())
                         continue;
                     if(msg.text.charAt(0) == '/'){
-                        commandManager.execute(connection.player, msg.text.substring(1));
+                        commandManager.execute(new JSPlayer(connection.player), msg.text.substring(1));
                     } else {
                         //todo: message event
                         server.broadcast(new ChatMessage(String.format("<%s>%s", connection.profile.name(), msg.text)));

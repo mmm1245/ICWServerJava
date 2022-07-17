@@ -127,6 +127,7 @@ public class PlayerEntity extends Entity {
 
     @Override
     public void kill() {
+        getServer().getEvents().PLAYER_DEATH.call(new JSPlayer(this));
         inventory.dropAll();
         closeInventory();
         teleport(getLocation().world().getServer().getLobby().getSpawn());

@@ -18,8 +18,12 @@ public class JSGameServer {
     public long ticksLasted() {
         return gameServer.ticksLasted();
     }
-    public PlayerEntity playerByName(String name){
-        return gameServer.playerByName(name);
+    public JSPlayer playerByName(String name){
+        PlayerEntity player = gameServer.playerByName(name);
+        if(player == null)
+            return null;
+        else
+            return new JSPlayer(player);
     }
     public JSWorld createWorld(){
         return new JSWorld(this.gameServer.createWorld());
@@ -47,6 +51,13 @@ public class JSGameServer {
                 .filter(player -> player != null)
                 .map(player -> new JSPlayer(player))
                 .collect(Collectors.toUnmodifiableList());
+    }
+    public JSPlayer playerById(int id){
+        PlayerEntity player = gameServer.playerById(id);
+        if(player == null)
+            return null;
+        else
+            return new JSPlayer(player);
     }
 
     public GameServer getInternal(){

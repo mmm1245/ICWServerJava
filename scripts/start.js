@@ -30,7 +30,7 @@ orb.register();
 //log.info(stoneCallback);
 //log.test(stoneCallback);
 events.PLAYER_JOIN.register((function(pl) {
-    log.info("callback: " + pl.getConnection().profile.name());
+    log.info("callback: " + pl.profile().name());
     pl.getInventory().addItem(items.STONE.createStack(5));
 }));
 

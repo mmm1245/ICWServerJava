@@ -17,7 +17,7 @@ commandManager.register("duel",(function(player1id,player2id){
 
 events.PLAYER_DEATH.register((function(player) {
     var world = player.location().world();
-    if(world.getData().type=="duel"){
+    if(world.getData() != null && world.getData().type=="duel"){
         player.sendChatMessage("You lost");
         if(world.getData().player1 == player.getId()){
             gameServer.playerById(world.getData().player2).sendChatMessage("You won");
@@ -30,7 +30,7 @@ events.PLAYER_DEATH.register((function(player) {
 
 events.PLAYER_LEAVE.register((function(player) {
     var world = player.location().world();
-    if(world.getData().type=="duel"){
+    if(world.getData() != null && world.getData().type=="duel"){
         player.sendChatMessage("You lost");
         if(world.getData().player1 == player.getId()){
             gameServer.playerById(world.getData().player2).sendChatMessage("You won");

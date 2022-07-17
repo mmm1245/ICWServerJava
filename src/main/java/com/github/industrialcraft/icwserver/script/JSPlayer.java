@@ -7,6 +7,7 @@ import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerAbilities;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import com.github.industrialcraft.icwserver.world.entity.RPlayerProfile;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 
@@ -66,6 +67,9 @@ public class JSPlayer {
     }
     public void sendCustomMessage(String type, String data){
         player.getConnection().send(new CustomDataMessage(type, data));
+    }
+    public RPlayerProfile profile(){
+        return player.getConnection().profile;
     }
     public void sendChatMessage(String text){
         player.sendChatMessage(text);

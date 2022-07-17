@@ -2,6 +2,7 @@ package com.github.industrialcraft.icwserver.net;
 
 import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.messages.AssetDataMessage;
+import com.github.industrialcraft.icwserver.script.JSPlayer;
 import com.github.industrialcraft.icwserver.util.Pair;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
@@ -42,7 +43,7 @@ public class WSServer extends WebSocketServer
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         PlayerEntity player = conn.<ClientConnection>getAttachment().player;
         if(player != null) {
-            player.getServer().getEvents().PLAYER_LEAVE.call(player);
+            player.getServer().getEvents().PLAYER_LEAVE.call(new JSPlayer(player));
             player.removeConnection();
         }
         this.connections.remove(conn.getAttachment());

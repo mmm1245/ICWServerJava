@@ -119,7 +119,7 @@ public class GameServer extends Thread{
 
                 getEvents().SERVER_TICK.call();
                 for (World world : this.worlds) {
-                    getEvents().WORLD_TICK.call(world);
+                    getEvents().WORLD_TICK.call(new JSWorld(world));
                     world.tick();
                 }
             } else {
@@ -158,7 +158,7 @@ public class GameServer extends Thread{
                     PlayerEntity pl = new PlayerEntity(getLobby().getSpawn(), connection);
                     connection.profile = new RPlayerProfile(msg.username, UUID.randomUUID());
                     connection.player = pl;
-                    getEvents().PLAYER_JOIN.call(pl);
+                    getEvents().PLAYER_JOIN.call(new JSPlayer(pl));
                     continue;
                 }
                 if(connection.player==null){

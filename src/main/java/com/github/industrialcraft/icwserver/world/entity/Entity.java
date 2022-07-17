@@ -46,6 +46,10 @@ public abstract class Entity implements IKillable, IJsonSerializable {
         teleport(this.location.withXY(x, y));
     }
 
+    public void applyKnockback(float x, float y){
+        //todo: default knockback
+    }
+
     @Override
     public JsonObject toJson(){
         JsonObject json = new JsonObject();

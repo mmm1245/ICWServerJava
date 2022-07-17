@@ -221,6 +221,20 @@ public class CommandManager {
                 return 1;
             })))))
         );
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("knockback")
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Float>argument("x", floatArg())
+                .then(RequiredArgumentBuilder.<JSPlayer,Float>argument("y", floatArg())
+                .executes(context -> {
+                    Entity entity = context.getSource().getInternal().getServer().entityById(getInteger(context, "id"));
+                    if(entity == null){
+                        context.getSource().sendChatMessage("Entity not found");
+                        return 1;
+                    }
+                    entity.applyKnockback(getFloat(context, "x"), getFloat(context, "y"));
+                    return 1;
+                }))))
+        );
     }
     public void register(String name, ScriptObjectMirror cmd, EArgumentType... types){
         RequiredArgumentBuilder requiredArgumentBuilder = null;

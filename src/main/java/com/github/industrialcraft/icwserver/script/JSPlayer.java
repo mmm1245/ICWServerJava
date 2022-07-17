@@ -71,6 +71,9 @@ public class JSPlayer {
     public RPlayerProfile profile(){
         return player.getConnection().profile;
     }
+    public void applyKnockback(float x, float y){
+        player.applyKnockback(x, y);
+    }
     public void sendChatMessage(String text){
         player.sendChatMessage(text);
     }

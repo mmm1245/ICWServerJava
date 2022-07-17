@@ -3,6 +3,7 @@ package com.github.industrialcraft.icwserver.world.entity;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
+import com.github.industrialcraft.icwserver.net.messages.KnockbackDataMessage;
 import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
@@ -108,6 +109,11 @@ public class PlayerEntity extends Entity {
     public void setLocationFromClient(ClientPlayerPositionMessage message){
         //todo: anticheat
         this.location = this.location.withXY(message.x, message.y);
+    }
+    @Override
+    public void applyKnockback(float x, float y){
+        if(connection != null)
+            connection.send(new KnockbackDataMessage(x, y));
     }
 
     @Override

@@ -20,6 +20,8 @@ public class ItemStackEntity extends Entity {
 
     @Override
     public void tick() {
+        this.physicsObject.tickKnockback();
+        //todo:check world orientation
         this.physicsObject.moveBy(0, -1);
     }
 

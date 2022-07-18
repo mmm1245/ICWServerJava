@@ -47,6 +47,9 @@ public class EntityFromJS extends Entity {
 
     @Override
     public void tick() {
+        if(physicsObject != null) {
+            physicsObject.tickKnockback();
+        }
         if(entitiyData.tickMethod != null)
             entitiyData.tickMethod.call(this);
     }

@@ -9,11 +9,15 @@ public class PhysicsObject {
     protected float hitboxW;
     protected float hitboxH;
     protected final EPhysicsLayer layer;
+    protected float knockbackX;
+    protected float knockbackY;
     public PhysicsObject(Entity entity, float hitboxW, float hitboxH, EPhysicsLayer layer) {
         this.entity = entity;
         this.hitboxW = hitboxW;
         this.hitboxH = hitboxH;
         this.layer = layer;
+        this.knockbackX = 0;
+        this.knockbackY = 0;
     }
     public boolean moveBy(float x, float y){
         float newX = entity.getLocation().x()+x;
@@ -24,7 +28,20 @@ public class PhysicsObject {
         }
         return false;
     }
-    public boolean canMoveTo(float x, float y){
+    public void applyKnockback(float x, float y){
+        this.knockbackX += x;
+        this.knockbackY += y;
+    }
+    public void resetKnockback(){
+        this.knockbackX = 0;
+        this.knockbackY = 0;
+    }
+    public void tickKnockback(){
+        moveBy(this.knockbackX*0.1f, this.knockbackY*0.1f);
+        this.knockbackX -= this.knockbackX*0.1;
+        this.knockbackY -= this.knockbackY*0.1;
+    }
+    public boolean canMoveTo (float x, float y){
         for(Entity entity : entity.getLocation().world().getEntities()){
             if(this.entity==entity)
                 continue;

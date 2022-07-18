@@ -47,7 +47,10 @@ public abstract class Entity implements IKillable, IJsonSerializable {
     }
 
     public void applyKnockback(float x, float y){
-        //todo: default knockback
+        PhysicsObject po = getPhysicalObject();
+        if(po != null){
+            po.applyKnockback(x, y);
+        }
     }
 
     @Override

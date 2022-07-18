@@ -4,11 +4,14 @@ import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.util.Pair;
 import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
-import com.github.industrialcraft.icwserver.world.entity.Entity;
+import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import com.github.industrialcraft.icwserver.world.entity.js.EntityFromJS;
+import org.w3c.dom.Entity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JSWorld {
     private World world;
@@ -22,8 +25,23 @@ public class JSWorld {
     public void remove(){
         world.remove();
     }
-    public List<Entity> entities(){
-        return world.getEntities();
+    public List<EntityFromJS> entities(){
+        return world.getEntities().stream()
+                .filter(entity -> (entity instanceof EntityFromJS))
+                .map(entity -> ((EntityFromJS)entity))
+                .collect(Collectors.toUnmodifiableList());
+    }
+    public List<JSPlayer> players(){
+        return world.getEntities().stream()
+                .filter(entity -> (entity instanceof PlayerEntity))
+                .map(entity -> new JSPlayer((PlayerEntity)entity))
+                .collect(Collectors.toUnmodifiableList());
+    }
+    public List<ItemStackEntity> items(){
+        return world.getEntities().stream()
+                .filter(entity -> (entity instanceof ItemStackEntity))
+                .map(entity -> ((ItemStackEntity)entity))
+                .collect(Collectors.toUnmodifiableList());
     }
     public List<Particle> particles(){
         return world.getParticles();

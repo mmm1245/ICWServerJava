@@ -3,8 +3,11 @@ package com.github.industrialcraft.icwserver.script;
 import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.Message;
+import com.github.industrialcraft.icwserver.physics.Raytracer;
 import com.github.industrialcraft.icwserver.world.World;
+import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +40,9 @@ public class JSGameServer {
     public List<JSWorld> worlds(){
         return this.gameServer.getWorlds().stream().map(world -> new JSWorld(world)).collect(Collectors.toUnmodifiableList());
     }
-
+    public Entity raytrace(JSLocation start, float angle, int length, ScriptObjectMirror predicate){
+        return Raytracer.raytrace(start.getInternal(), angle, length, entity -> predicate.call(entity).toString().equalsIgnoreCase("true"));
+    }
     public void broadcastMessage(Message message){
         this.gameServer.getWSServer().broadcast(message);
     }

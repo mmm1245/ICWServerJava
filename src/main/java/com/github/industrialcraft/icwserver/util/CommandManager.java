@@ -1,5 +1,6 @@
 package com.github.industrialcraft.icwserver.util;
 
+import com.github.industrialcraft.icwserver.inventory.Item;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.script.JSEntityData;
 import com.github.industrialcraft.icwserver.script.JSLocation;
@@ -9,6 +10,7 @@ import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.icwserver.world.entity.js.EntityFromJS;
+import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -232,6 +234,50 @@ public class CommandManager {
                         return 1;
                     }
                     entity.applyKnockback(getFloat(context, "x"), getFloat(context, "y"));
+                    return 1;
+                }))))
+        );
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("explosion")
+                .then(RequiredArgumentBuilder.<JSPlayer,Float>argument("x", floatArg())
+                .then(RequiredArgumentBuilder.<JSPlayer,Float>argument("y", floatArg())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("w", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Float>argument("power", floatArg())
+                .then(RequiredArgumentBuilder.<JSPlayer,Float>argument("radius", floatArg())
+                .executes(context -> {
+                    World world = context.getSource().getInternal().getServer().worldById(getInteger(context, "w"));
+                    if(world == null){
+                        context.getSource().sendChatMessage("World not found");
+                        return 1;
+                    }
+                    world.spawnExplosion(getFloat(context, "x"), getFloat(context, "y"), getFloat(context, "power"), getFloat(context, "radius"));
+                    return 1;
+                }))))))
+        );
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("give")
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,String>argument("item", string())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("count", integer())
+                .executes(context -> {
+                    Entity entity = context.getSource().getInternal().getServer().entityById(getInteger(context, "id"));
+                    if(entity == null){
+                        context.getSource().sendChatMessage("Entity not found");
+                        return 1;
+                    }
+                    if(entity.getInventory() == null){
+                        context.getSource().sendChatMessage("That entity does not have inventory");
+                        return 1;
+                    }
+                    Item item = context.getSource().getInternal().getServer().getScriptingManager().itemRegistry.getItems().get(getString(context, "item"));
+                    if(item == null){
+                        context.getSource().sendChatMessage("Item not found");
+                        return 1;
+                    }
+                    int count = getInteger(context, "count");
+                    if(count < 0 || count > item.getStackSize()){
+                        context.getSource().sendChatMessage("Item count not within 0.." + item.getStackSize());
+                        return 1;
+                    }
+                    entity.getInventory().addItem(new ItemStack(item, count));
                     return 1;
                 }))))
         );

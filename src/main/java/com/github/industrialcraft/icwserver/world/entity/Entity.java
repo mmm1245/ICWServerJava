@@ -10,6 +10,7 @@ import com.github.industrialcraft.icwserver.world.entity.data.IKillable;
 import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
+import mikera.vectorz.Vector2;
 
 public abstract class Entity implements IKillable, IJsonSerializable {
     protected Location location;
@@ -52,6 +53,16 @@ public abstract class Entity implements IKillable, IJsonSerializable {
             po.applyKnockback(x, y);
         }
     }
+    //todo: move to jsentity
+    public void applyKnockbackAtAngle(float angle, float magnitude){
+        PhysicsObject po = getPhysicalObject();
+        if(po != null){
+            Vector2 vector = new Vector2((Math.cos(Math.toRadians((angle + 360) % 360))),(Math.sin(Math.toRadians((angle + 360) % 360))));
+            vector.normalise();
+            vector.multiply(magnitude);
+            po.applyKnockback((float)vector.x, (float)vector.y);
+        }
+    }
 
     @Override
     public JsonObject toJson(){
@@ -74,9 +85,9 @@ public abstract class Entity implements IKillable, IJsonSerializable {
     public void onDeath(){}
 
     public void setHealth(float health) {
+        this.health = health;
         if(health <= 0)
             kill();
-        this.health = health;
     }
     public float getHealth() {
         return this.health;

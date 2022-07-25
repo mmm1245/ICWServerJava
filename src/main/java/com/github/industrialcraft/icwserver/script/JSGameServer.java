@@ -4,6 +4,7 @@ import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
+import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
@@ -48,6 +49,12 @@ public class JSGameServer {
     }
     public void broadcastMessageInWorld(Message message, JSWorld world){
         this.gameServer.getWSServer().broadcastInWorld(message, world.getInternal());
+    }
+    public void spawnExplosion(JSLocation location, int power, int radius){
+        location.world().getInternal().spawnExplosion(location.x(), location.y(), power, radius);
+    }
+    public void spawnExplosion(Location location, int power, int radius){
+        location.world().spawnExplosion(location.x(), location.y(), power, radius);
     }
 
     public List<JSPlayer> players() {

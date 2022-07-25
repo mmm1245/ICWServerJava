@@ -1,6 +1,7 @@
 package com.github.industrialcraft.icwserver.inventory;
 
 import com.github.industrialcraft.icwserver.net.messages.PlayerAttackMessage;
+import com.github.industrialcraft.icwserver.script.JSPlayer;
 import com.github.industrialcraft.icwserver.util.State2AssetStorage;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.inventorysystem.IItem;
@@ -24,7 +25,7 @@ public class Item implements IItem {
     }
     public boolean onAttackHandlerCall(PlayerEntity player, ItemStack stack, PlayerAttackMessage message){
         if(attackHandler != null) {
-            attackHandler.call(this, player, stack, message);
+            attackHandler.call(stack, new JSPlayer(player), message);
             return true;
         }
         return false;

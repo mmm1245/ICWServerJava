@@ -4,6 +4,8 @@ import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
+import mikera.vectorz.Vector2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,7 +53,22 @@ public class World {
     public void addParticle(Particle particle){
         this.particles.add(particle);
     }
-
+    public void spawnExplosion(float x, float y, float power, float radius){
+        addParticle(new Particle("explosion", 60, x, y).addNumber("power", power).addNumber("radius", radius));
+        for(Entity entity : entities){
+            if(entity.getPhysicalObject() == null)
+                continue;
+            float dist = (float) Math.sqrt(entity.getLocation().distanceToNS(new Location(x, y, this)));
+            if(dist < radius){
+                float damage = power*(1-(dist/radius));
+                Vector2 vector = new Vector2(entity.getLocation().x()-x, entity.getLocation().y()-y);
+                vector.normalise();
+                vector.multiply(damage*3);
+                entity.applyKnockback((float) vector.x, (float) vector.y);
+                entity.damage(-damage, EDamageType.EXPLOSION);
+            }
+        }
+    }
     public Entity byId(int id){
         for(Entity entity : entities){
             if(entity.id == id)

@@ -8,9 +8,11 @@ public class PhysicsObject {
     protected final Entity entity;
     protected float hitboxW;
     protected float hitboxH;
-    protected final EPhysicsLayer layer;
-    protected float knockbackX;
-    protected float knockbackY;
+    public final EPhysicsLayer layer;
+    public float knockbackX;
+    public float knockbackY;
+    public float knockbackFalloff;
+    public float knockbackEffectivity;
     public PhysicsObject(Entity entity, float hitboxW, float hitboxH, EPhysicsLayer layer) {
         this.entity = entity;
         this.hitboxW = hitboxW;
@@ -18,6 +20,8 @@ public class PhysicsObject {
         this.layer = layer;
         this.knockbackX = 0;
         this.knockbackY = 0;
+        this.knockbackFalloff = 0.1f;
+        this.knockbackEffectivity = 1;
     }
     public boolean moveBy(float x, float y){
         float newX = entity.getLocation().x()+x;
@@ -29,19 +33,21 @@ public class PhysicsObject {
         return false;
     }
     public void applyKnockback(float x, float y){
-        this.knockbackX += x;
-        this.knockbackY += y;
+        this.knockbackX += x*knockbackEffectivity;
+        this.knockbackY += y*knockbackEffectivity;
     }
     public void resetKnockback(){
         this.knockbackX = 0;
         this.knockbackY = 0;
     }
     public void tickKnockback(){
-        moveBy(this.knockbackX*0.1f, this.knockbackY*0.1f);
-        this.knockbackX -= this.knockbackX*0.1;
-        this.knockbackY -= this.knockbackY*0.1;
+        moveBy(this.knockbackX, this.knockbackY);
+        this.knockbackX -= this.knockbackX*this.knockbackFalloff;
+        this.knockbackY -= this.knockbackY*this.knockbackFalloff;
     }
     public boolean canMoveTo (float x, float y){
+        if(layer == EPhysicsLayer.PROJECTILE || layer == EPhysicsLayer.TRANSPARENT)
+            return true;
         for(Entity entity : entity.getLocation().world().getEntities()){
             if(this.entity==entity)
                 continue;
@@ -55,7 +61,7 @@ public class PhysicsObject {
         }
         return true;
     }
-    public Entity collidesAt(float x, float y, Predicate<Entity> entityPredicate){
+    public Entity collidesAt(float x, float y, Predicate<Entity> entityPredicate, boolean checkLayer){
         for(Entity entity : entity.getLocation().world().getEntities()){
             if(this.entity==entity)
                 continue;
@@ -66,7 +72,21 @@ public class PhysicsObject {
             PhysicsObject physics2 = entity.getPhysicalObject();
             if(physics2==null)
                 continue;
-            if(Collisions.AABB(x, y, hitboxW, hitboxH, entity.getLocation().x(), entity.getLocation().y(), physics2.hitboxW, physics2.hitboxH))
+            if((checkLayer?collides(this.layer, physics2.layer):true)&&Collisions.AABB(x, y, hitboxW, hitboxH, entity.getLocation().x(), entity.getLocation().y(), physics2.hitboxW, physics2.hitboxH))
+                return entity;
+        }
+        return null;
+    }
+    public Entity collides(Predicate<Entity> entityPredicate, boolean checkLayer){
+        for(Entity entity : entity.getLocation().world().getEntities()){
+            if(this.entity.id == entity.id)
+                continue;
+            PhysicsObject physics2 = entity.getPhysicalObject();
+            if(physics2==null)
+                continue;
+            if(!entityPredicate.test(entity))
+                continue;
+            if((checkLayer?collides(this.layer, physics2.layer):true)&&Collisions.AABB(this.entity.getLocation().x(), this.entity.getLocation().y(), hitboxW, hitboxH, entity.getLocation().x(), entity.getLocation().y(), physics2.hitboxW, physics2.hitboxH))
                 return entity;
         }
         return null;
@@ -78,6 +98,8 @@ public class PhysicsObject {
 
     protected static boolean collides(EPhysicsLayer layer1, EPhysicsLayer layer2){
         if(layer1==EPhysicsLayer.TRANSPARENT||layer2==EPhysicsLayer.TRANSPARENT)
+            return false;
+        if(layer1==EPhysicsLayer.PROJECTILE&&layer2==EPhysicsLayer.PROJECTILE)
             return false;
         return layer1==EPhysicsLayer.WALL||layer2==EPhysicsLayer.WALL;
     }

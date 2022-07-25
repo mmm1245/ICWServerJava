@@ -135,7 +135,11 @@ public class PlayerEntity extends Entity {
     public void kill() {
         getServer().getEvents().PLAYER_DEATH.call(new JSPlayer(this));
         inventory.dropAll();
+        //todo: drop hand stack
+        inventory.overflow(handItemStack);
+        handItemStack = null;
         closeInventory();
+        getPhysicalObject().resetKnockback();
         teleport(getLocation().world().getServer().getLobby().getSpawn());
         setHealth(getMaxHealth());
     }

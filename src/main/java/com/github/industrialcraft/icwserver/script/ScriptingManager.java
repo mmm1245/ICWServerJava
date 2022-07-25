@@ -3,6 +3,7 @@ package com.github.industrialcraft.icwserver.script;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.script.event.Events;
 import com.github.industrialcraft.icwserver.util.CommandManager;
+import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.openjdk.nashorn.internal.objects.Global;
@@ -52,6 +53,8 @@ public class ScriptingManager {
         this.binding.put("events", this.events);
 
         this.binding.put("scheduler", this.gameServer.getInternal().getScheduler());
+
+        this.binding.put("EDamageType", Arrays.stream(EDamageType.values()).collect(Collectors.toUnmodifiableMap(o -> o.name(), o -> o)));
 
         this.binding.put("EPhysicsLayers", Arrays.stream(EPhysicsLayer.values()).collect(Collectors.toUnmodifiableMap(o -> o.name(), o -> o)));
 

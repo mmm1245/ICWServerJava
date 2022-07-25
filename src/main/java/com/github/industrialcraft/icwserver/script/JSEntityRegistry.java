@@ -52,7 +52,7 @@ public class JSEntityRegistry {
             this.tickMethod = method;
             return this;
         }
-        public EntityTemplate withDeath(ScriptObjectMirror method){
+        public EntityTemplate withOnDeath(ScriptObjectMirror method){
             this.onDeathMethod = method;
             return this;
         }

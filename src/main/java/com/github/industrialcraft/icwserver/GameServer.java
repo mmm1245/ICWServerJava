@@ -21,7 +21,6 @@ import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 
-import javax.swing.text.TabableView;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -132,7 +131,7 @@ public class GameServer extends Thread{
             }
             for(ClientConnection connection : this.server.getClientConnections()){
                 if(connection.player != null) {
-                    connection.send(new PlayerInventoryMessage(connection.player.getInventory(), connection.player.getOpenedInventory(), connection.player.getHandItemStack(), connection.player.getHealth()));
+                    connection.send(new PlayerInventoryMessage(connection.player.getInventory(), connection.player.getOpenedInventory(), connection.player.getHandItemStack(), connection.player.getHealth(), connection.player.getAllStatusEffects()));
                     connection.send(connection.player.getPlayerAbilities().createControllerMessage(connection.player, false));
                 }
             }

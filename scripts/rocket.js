@@ -3,9 +3,9 @@ rocket.withPhysicsData(10, 10, EPhysicsLayers.PROJECTILE);
 rocket.withOnSpawn((function() {
     this.data = Object.assign({shooter:-1}, this.data);
     this.getPhysicalObject().knockbackFalloff = 0;
-    this.getPhysicalObject().gravity = 0;
 }));
 rocket.withOnTick((function() {
+    this.getPhysicalObject().gravity = 0;
     var shooter = this.data.shooter;
     if(this.getPhysicalObject().collides((function(entity) {return shooter!=entity.id;}), true) != null){
         this.kill();

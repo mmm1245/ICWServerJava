@@ -47,6 +47,7 @@ public class PhysicsObject {
         moveBy(this.knockbackX, this.knockbackY + (entity.getLocation().world().orientation==EWorldOrientation.SIDE?gravity:0));
         this.knockbackX -= this.knockbackX*this.knockbackFalloff;
         this.knockbackY -= this.knockbackY*this.knockbackFalloff;
+        this.gravity = -2;
     }
     public boolean canMoveTo (float x, float y){
         if(layer == EPhysicsLayer.PROJECTILE || layer == EPhysicsLayer.TRANSPARENT)

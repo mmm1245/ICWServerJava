@@ -28,8 +28,10 @@ public class JSStatusEffectRegistry {
         private String id;
         private ScriptObjectMirror spawnMethod;
         private ScriptObjectMirror tickMethod;
+        private boolean showToPlayer;
         public StatusEffectTemplate(String id) {
             this.id = id;
+            this.showToPlayer = false;
         }
         public StatusEffectTemplate withOnTick(ScriptObjectMirror method){
             this.tickMethod = method;
@@ -39,10 +41,14 @@ public class JSStatusEffectRegistry {
             this.spawnMethod = method;
             return this;
         }
+        public StatusEffectTemplate withShowToPlayer(){
+            this.showToPlayer = true;
+            return this;
+        }
         public JSStatusEffectData register(){
             if(statusEffects.containsKey(id))
                 throw new IllegalStateException(id + " already registered");
-            JSStatusEffectData statusEffectData = new JSStatusEffectData(id, spawnMethod, tickMethod);
+            JSStatusEffectData statusEffectData = new JSStatusEffectData(id, spawnMethod, tickMethod, showToPlayer);
             statusEffects.put(id, statusEffectData);
             return statusEffectData;
         }

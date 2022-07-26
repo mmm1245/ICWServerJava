@@ -3,9 +3,9 @@ platform.withPhysicsData(0, 0, EPhysicsLayers.WALL);
 platform.withOnSpawn((function() {
     this.data = Object.assign({width:100,height:5}, this.data);
     this.getPhysicalObject().knockbackEffectivity = 0;
-    this.getPhysicalObject().gravity = 0;
 }));
 platform.withOnTick((function() {
+   this.getPhysicalObject().gravity = 0;
    this.getPhysicalObject().resize(this.data.width, this.data.height);
 }));
 platform.withDamageTypeModifier((function() {

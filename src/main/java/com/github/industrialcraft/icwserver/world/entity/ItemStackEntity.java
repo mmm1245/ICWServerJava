@@ -65,4 +65,7 @@ public class ItemStackEntity extends Entity {
         entity.dead = this.dead;
         return entity;
     }
+    public ItemStack getStack() {
+        return is;
+    }
 }

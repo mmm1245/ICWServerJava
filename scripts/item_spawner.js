@@ -6,7 +6,7 @@ item_spawner.withOnTick((function() {
     if(this.data.timer <= 0){
         var item = items[this.data.item];
         if(item != null){
-            gameServer.spawnItem(this.getLocation(), item.create(this.data.count));
+            gameServer.spawnItem(this.location(), item.create(this.data.count));
         }
         this.data.timer = this.data.delay;
     } else {

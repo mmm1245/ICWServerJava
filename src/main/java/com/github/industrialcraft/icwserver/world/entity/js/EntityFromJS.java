@@ -2,6 +2,7 @@ package com.github.industrialcraft.icwserver.world.entity.js;
 
 import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
+import com.github.industrialcraft.icwserver.script.JSEntity;
 import com.github.industrialcraft.icwserver.script.JSEntityData;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
@@ -10,18 +11,16 @@ import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
-import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import javax.script.Invocable;
-import javax.script.ScriptException;
 
 public class EntityFromJS extends Entity {
-    private JSEntityData entitiyData;
+    private JSEntityData entityData;
     private PhysicsObject physicsObject;
     private Inventory inventory;
     public EntityFromJS(JSEntityData entitiyData, Location location, Object data) {
         super(location);
-        this.entitiyData = entitiyData;
+        this.entityData = entitiyData;
         if(entitiyData.physicsData!=null)
             this.physicsObject = entitiyData.physicsData.create(this);
         this.setHealth(getMaxHealth());
@@ -33,7 +32,7 @@ public class EntityFromJS extends Entity {
         }, this);
         this.data = data;
         if(entitiyData.spawnMethod != null)
-            entitiyData.spawnMethod.call(this);
+            entitiyData.spawnMethod.call(new JSEntity(this));
     }
 
     public boolean modData(Object data){
@@ -51,20 +50,20 @@ public class EntityFromJS extends Entity {
         if(physicsObject != null) {
             physicsObject.tickKnockback();
         }
-        if(entitiyData.tickMethod != null)
-            entitiyData.tickMethod.call(this);
+        if(entityData.tickMethod != null)
+            entityData.tickMethod.call(new JSEntity(this));
     }
     @Override
     public void onDeath() {
-        if(entitiyData.onDeathMethod != null)
-            entitiyData.onDeathMethod.call(this);
+        if(entityData.onDeathMethod != null)
+            entityData.onDeathMethod.call(new JSEntity(this));
         if(inventory != null)
             inventory.dropAll();
     }
     @Override
     public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
-        if(entitiyData.onPlayerInteractMethod != null){
-            entitiyData.onPlayerInteractMethod.call(this, player, message);
+        if(entityData.onPlayerInteractMethod != null){
+            entityData.onPlayerInteractMethod.call(new JSEntity(this), player, message);
             return true;
         }
         return false;
@@ -72,7 +71,7 @@ public class EntityFromJS extends Entity {
 
     @Override
     public Entity clone(Location newLocation) {
-        EntityFromJS entity = new EntityFromJS(this.entitiyData, newLocation, getServer().getScriptingManager().tryDeepCopy(this.data));
+        EntityFromJS entity = new EntityFromJS(this.entityData, newLocation, getServer().getScriptingManager().tryDeepCopy(this.data));
         entity.setHealth(getHealth());
         entity.physicsObject = this.physicsObject.clone(entity);
         entity.dead = this.dead;
@@ -82,25 +81,28 @@ public class EntityFromJS extends Entity {
 
     @Override
     public float getDamageTypeModifier(EDamageType type) {
-        if(entitiyData.damageTypeModifierMethod != null){
-            return Float.parseFloat(entitiyData.damageTypeModifierMethod.call(this, type).toString());
+        if(entityData.damageTypeModifierMethod != null){
+            return Float.parseFloat(entityData.damageTypeModifierMethod.call(new JSEntity(this), type).toString());
         }
         return 1;
     }
     @Override
     public JsonObject toJson() {
         JsonObject json = super.toJson();
-        if(entitiyData.animationStateProvider != null)
-            json.addProperty("state", entitiyData.animationStateProvider.call(this).toString());
+        if(entityData.animationStateProvider != null)
+            json.addProperty("state", entityData.animationStateProvider.call(new JSEntity(this)).toString());
         return json;
     }
     @Override
     public String getType() {
-        return entitiyData.type;
+        return entityData.type;
+    }
+    public JSEntityData getEntityData() {
+        return entityData;
     }
     @Override
     public float getMaxHealth() {
-        return entitiyData==null?1:entitiyData.maxHealth;
+        return entityData ==null?1: entityData.maxHealth;
     }
 
     @Override

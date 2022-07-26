@@ -1,6 +1,7 @@
 package com.github.industrialcraft.icwserver.world.entity;
 
 import com.github.industrialcraft.icwserver.GameServer;
+import com.github.industrialcraft.icwserver.script.JSEntity;
 import com.github.industrialcraft.icwserver.script.JSStatusEffectData;
 
 public class StatusEffect {
@@ -15,7 +16,7 @@ public class StatusEffect {
     }
     public void tick(Entity entity){
         if(type.tickMethod() != null)
-            type.tickMethod().call(this, entity);//todo: JSEntity
+            type.tickMethod().call(this, new JSEntity(entity));
         timeLeft--;
     }
 }

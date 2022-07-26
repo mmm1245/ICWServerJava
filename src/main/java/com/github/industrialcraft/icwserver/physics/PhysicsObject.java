@@ -104,7 +104,12 @@ public class PhysicsObject {
         return layer1==EPhysicsLayer.WALL||layer2==EPhysicsLayer.WALL;
     }
     public PhysicsObject clone(Entity entity){
-        return new PhysicsObject(entity, hitboxW, hitboxH, layer);
+        PhysicsObject po = new PhysicsObject(entity, hitboxW, hitboxH, layer);
+        po.knockbackX = this.knockbackX;
+        po.knockbackY = this.knockbackY;
+        po.knockbackFalloff = this.knockbackFalloff;
+        po.knockbackEffectivity = this.knockbackEffectivity;
+        return po;
     }
     public Entity getEntity() {
         return entity;

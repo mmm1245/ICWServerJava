@@ -42,6 +42,7 @@ public class PlayerEntity extends Entity {
     }
     @Override
     public void tick() {
+        this.getPlayerAbilities().reset();
         super.tick();
         if(openedInventory != null && (openedInventory.isDead() || (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50)))
             openedInventory = null;
@@ -51,8 +52,6 @@ public class PlayerEntity extends Entity {
             if(runningTaunt.isFinished())
                 runningTaunt = null;
         }
-
-        this.getPlayerAbilities().reset();
     }
 
     @Override

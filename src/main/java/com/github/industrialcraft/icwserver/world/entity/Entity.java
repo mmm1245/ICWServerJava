@@ -68,7 +68,6 @@ public abstract class Entity implements IKillable, IJsonSerializable {
             po.applyKnockback(x, y);
         }
     }
-    //todo: move to jsentity
     public void applyKnockbackAtAngle(float angle, float magnitude){
         PhysicsObject po = getPhysicalObject();
         if(po != null){

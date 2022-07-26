@@ -11,9 +11,10 @@ import com.github.industrialcraft.icwserver.world.entity.RPlayerProfile;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 
-public class JSPlayer {
+public class JSPlayer extends JSEntity{
     PlayerEntity player;
     public JSPlayer(PlayerEntity player) {
+        super(player);
         this.player = player;
     }
     public void openInventory(Entity entity){
@@ -27,9 +28,6 @@ public class JSPlayer {
     }
     public float getMaxHealth() {
         return player.getMaxHealth();
-    }
-    public JSLocation location(){
-        return new JSLocation(player.getLocation());
     }
 
     public ItemStack getHandItemStack() {

@@ -58,9 +58,6 @@ public class JSGameServer {
     public void spawnExplosion(Location location, int power, int radius){
         location.world().spawnExplosion(location.x(), location.y(), power, radius);
     }
-    public void spawnItem(Location location, ItemStack is){//todo:remove
-        new ItemStackEntity(location, is);
-    }
     public void spawnItem(JSLocation location, ItemStack is){
         new ItemStackEntity(location.getInternal(), is);
     }

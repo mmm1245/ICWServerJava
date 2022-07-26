@@ -31,7 +31,7 @@ public class Item implements IItem {
     }
     public boolean onAttackHandlerCall(PlayerEntity player, ItemStack stack, PlayerAttackMessage message){
         if(attackHandler != null) {
-            attackHandler.call(stack, new JSPlayer(player), message);
+            attackHandler.call(stack, new JSPlayer(player), message.angle, message.power);
             return true;
         }
         return false;

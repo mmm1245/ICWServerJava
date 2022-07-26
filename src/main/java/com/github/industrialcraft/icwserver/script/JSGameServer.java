@@ -6,6 +6,7 @@ import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
 import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.util.Location;
+import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
@@ -45,7 +46,7 @@ public class JSGameServer {
         return this.gameServer.getWorlds().stream().map(world -> new JSWorld(world)).collect(Collectors.toUnmodifiableList());
     }
     public Entity raytrace(JSLocation start, float angle, int length, ScriptObjectMirror predicate){
-        return Raytracer.raytrace(start.getInternal(), angle, length, entity -> predicate.call(entity).toString().equalsIgnoreCase("true"));
+        return Raytracer.raytrace(start.getInternal(), angle, length, entity -> predicate.call(null, new JSEntity(entity)).toString().equalsIgnoreCase("true"));
     }
     public void broadcastMessage(Message message){
         this.gameServer.getWSServer().broadcast(message);
@@ -55,6 +56,9 @@ public class JSGameServer {
     }
     public void spawnExplosion(JSLocation location, int power, int radius){
         location.world().getInternal().spawnExplosion(location.x(), location.y(), power, radius);
+    }
+    public Particle spawnParticle(String type, JSLocation location, int lifetime){
+        return location.world().spawnParticle(type, (int) location.x(), (int) location.y(), lifetime);
     }
     public void spawnItem(JSLocation location, ItemStack is){
         new ItemStackEntity(location.getInternal(), is);

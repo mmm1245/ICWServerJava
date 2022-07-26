@@ -79,6 +79,9 @@ public class JSEntity {
     public String getType(){
         return this.entity.getType();
     }
+    public int getId(){
+        return entity.id;
+    }
 
     public JSPlayer toPlayerIP(){
         if(entity instanceof PlayerEntity player){

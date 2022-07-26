@@ -78,9 +78,6 @@ public class JSPlayer extends JSEntity{
     public PlayerAbilities playerAbilities(){
         return player.getPlayerAbilities();
     }
-    public int getId(){
-        return player.id;
-    }
     public PlayerEntity getInternal() {
         return this.player;
     }

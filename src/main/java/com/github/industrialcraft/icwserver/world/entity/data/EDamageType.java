@@ -7,5 +7,6 @@ public enum EDamageType {
     FIRE,
     LAVA,
     WATER,
-    EXPLOSION
+    EXPLOSION,
+    BLADE
 }

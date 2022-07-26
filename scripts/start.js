@@ -2,14 +2,6 @@ function stoneCallback(){
     log.info("callback");
 }
 
-var stone = itemRegistry.createTemplate("STONE", 100);
-stone.withAttackHandler(stoneCallback);
-stone.withAnimationStateProvider((function() {
-     return gameServer.ticksLasted();
- }));
-stone.addRenderState("default", "assets/items/stone.png");
-stone.register();
-
 var orb = entityRegistry.createTemplate("ORB", 20);
 orb.withOnSpawn((function() {
     //this.data = {cnt:0};
@@ -53,5 +45,9 @@ var taskid3 = scheduler.times((function() {
 }),40,40,3,null);
 log.info("task3 id is %s", taskid3);*/
 //scheduler.killTask(taskid);
+
+statusEffectRegistry.createTemplate("SPAM").withOnTick((function(entity) {
+   log.info("spam:%s", entity);
+})).register();
 
 tauntRegistry.createTemplate("WIN").addPart("assets/taunts/win/win_1.png", 20).addPart("assets/taunts/win/win_2.png",10).register();

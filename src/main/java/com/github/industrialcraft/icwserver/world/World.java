@@ -14,7 +14,7 @@ import java.util.List;
 
 public class World {
     protected boolean removed;
-    protected final boolean lobby;
+    public final boolean lobby;
     protected final LinkedList<Entity> entitiesToAdd;
     protected final ArrayList<Entity> entities;
     protected final ArrayList<Particle> particles;
@@ -33,8 +33,7 @@ public class World {
     public void tick(){
         partialTick();
         for(Entity entity : this.entities){
-            if(!entity.frozen)
-                entity.tick();
+            entity.tick();
         }
     }
     public void partialTick(){

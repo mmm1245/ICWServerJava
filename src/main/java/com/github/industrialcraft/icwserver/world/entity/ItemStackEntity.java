@@ -14,12 +14,13 @@ public class ItemStackEntity extends Entity {
     private PhysicsObject physicsObject;
     public ItemStackEntity(Location location, ItemStack is) {
         super(location);
-        this.is = is;
+        this.is = is.clone();
         this.physicsObject = new PhysicsObject(this, 4, 4, EPhysicsLayer.OBJECT);
     }
 
     @Override
     public void tick() {
+        super.tick();
         this.physicsObject.tickKnockback();
         //todo:check world orientation
         this.physicsObject.moveBy(0, -1);
@@ -62,7 +63,6 @@ public class ItemStackEntity extends Entity {
         entity.setHealth(getHealth());
         entity.physicsObject = this.physicsObject.clone(entity);
         entity.dead = this.dead;
-        entity.frozen = this.frozen;
         return entity;
     }
 }

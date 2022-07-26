@@ -53,9 +53,9 @@ public class GameServer extends Thread{
         this.tickManager = new TickManager();
         this.scriptingManager = new ScriptingManager(new JSGameServer(this), true);
         this.scriptingManager.runScripts(files);
+        getEvents().START_SERVER.call();
         this.worlds.add(new World(true, this));
         getEvents().CREATE_WORLD.call(new JSWorld(this.worlds.get(0)));
-        getEvents().START_SERVER.call();
     }
     public TickManager getTickManager() {
         return tickManager;
@@ -133,7 +133,7 @@ public class GameServer extends Thread{
             for(ClientConnection connection : this.server.getClientConnections()){
                 if(connection.player != null) {
                     connection.send(new PlayerInventoryMessage(connection.player.getInventory(), connection.player.getOpenedInventory(), connection.player.getHandItemStack(), connection.player.getHealth()));
-                    connection.send(connection.player.getPlayerAbilities().createControllerMessage(connection.player, connection.player.frozen));
+                    connection.send(connection.player.getPlayerAbilities().createControllerMessage(connection.player, false));
                 }
             }
             while(server.hasMessage()){

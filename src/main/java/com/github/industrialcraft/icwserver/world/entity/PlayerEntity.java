@@ -37,11 +37,12 @@ public class PlayerEntity extends Entity {
             }
         }, this);
 
-        this.playerAbilities = new PlayerAbilities(2, 3, 5, false, false);
+        this.playerAbilities = new PlayerAbilities();
         this.runningTaunt = null;
     }
     @Override
     public void tick() {
+        super.tick();
         if(openedInventory != null && (openedInventory.isDead() || (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50)))
             openedInventory = null;
 
@@ -50,6 +51,8 @@ public class PlayerEntity extends Entity {
             if(runningTaunt.isFinished())
                 runningTaunt = null;
         }
+
+        this.getPlayerAbilities().reset();
     }
 
     @Override

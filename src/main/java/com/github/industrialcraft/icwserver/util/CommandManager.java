@@ -2,13 +2,11 @@ package com.github.industrialcraft.icwserver.util;
 
 import com.github.industrialcraft.icwserver.inventory.Item;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
-import com.github.industrialcraft.icwserver.script.JSEntityData;
-import com.github.industrialcraft.icwserver.script.JSLocation;
-import com.github.industrialcraft.icwserver.script.JSPlayer;
-import com.github.industrialcraft.icwserver.script.ScriptingManager;
+import com.github.industrialcraft.icwserver.script.*;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import com.github.industrialcraft.icwserver.world.entity.StatusEffect;
 import com.github.industrialcraft.icwserver.world.entity.js.EntityFromJS;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.mojang.brigadier.CommandDispatcher;
@@ -133,6 +131,9 @@ public class CommandManager {
                 return 1;
         })));
         this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("spawn")
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("x", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("y", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("w", integer())
                 .then(RequiredArgumentBuilder.<JSPlayer,String>argument("type", word())
                 .then(RequiredArgumentBuilder.<JSPlayer,String>argument("data", greedyString())
                 .executes(context -> {
@@ -142,40 +143,44 @@ public class CommandManager {
                         context.getSource().sendChatMessage("Entity type not found");
                         return 1;
                     }
+                    World world = context.getSource().getInternal().getServer().worldById(getInteger(context, "w"));
+                    if(world == null){
+                        context.getSource().sendChatMessage("World not found");
+                        return 1;
+                    }
                     try {
                         Object data = scriptingManager.getEngine().eval("(" + getString(context, "data") + ")");
-                        entityData.spawn(new JSLocation(context.getSource().getInternal().getLocation()), data);
+                        entityData.spawn(new JSLocation(getInteger(context, "x"), getInteger(context, "y"), world), data);
                     } catch (ScriptException e) {
                         context.getSource().sendChatMessage("Invalid data for entity spawn: " + e.getMessage());
                     }
                     return 1;
-            })))
+            }))))))
         );
-        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("noclip").executes(context -> {
-            context.getSource().getInternal().getPlayerAbilities().toggleNoClip();
-            context.getSource().sendChatMessage("Toggled noclip " + (context.getSource().getInternal().getPlayerAbilities().noClip?"ON":"OFF"));
-            return 1;
-        }));
-        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("fly").executes(context -> {
-            context.getSource().getInternal().getPlayerAbilities().toggleTopDown();
-            context.getSource().sendChatMessage("Toggled fly " + (context.getSource().getInternal().getPlayerAbilities().topDown?"ON":"OFF"));
-            return 1;
-        }));
-        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("freeze")
-                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer()).executes(context -> {
-                    Entity entity = context.getSource().getInternal().getServer().entityById(getInteger(context, "id"));
-                    if(entity != null) {
-                        entity.frozen = !entity.frozen;
-                        context.getSource().sendChatMessage("Entity is now " + (entity.frozen?"frozen":"unfrozen"));
-                    } else
-                        context.getSource().sendChatMessage("Entity not found");
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("effect")
+            .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
+            .then(RequiredArgumentBuilder.<JSPlayer,String>argument("type", string())
+            .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("time", integer())
+            .then(RequiredArgumentBuilder.<JSPlayer,String>argument("data", greedyString()).executes(context -> {
+                Entity entity = context.getSource().getInternal().getServer().entityById(getInteger(context, "id"));
+                ScriptingManager scriptingManager = context.getSource().getInternal().getServer().getScriptingManager();
+                if(entity == null){
+                    context.getSource().sendChatMessage("Entity not found");
                     return 1;
-                })).executes(context -> {
-                    context.getSource().getInternal().frozen = !context.getSource().getInternal().frozen;
-                    context.getSource().sendChatMessage("You are now " + (context.getSource().getInternal().frozen?"frozen":"unfrozen"));
+                }
+                JSStatusEffectData statusEffectData = scriptingManager.statusEffectRegistry.getStatusEffects().get(getString(context, "type"));
+                if(statusEffectData == null){
+                    context.getSource().sendChatMessage("Status effect not found");
                     return 1;
-                })
-        );
+                }
+                StatusEffect statusEffect = entity.addStatusEffect(statusEffectData, getInteger(context, "time"));
+                try {
+                    statusEffect.data = scriptingManager.getEngine().eval("(" + getString(context, "data") + ")");
+                } catch (ScriptException e) {
+                    context.getSource().sendChatMessage("Status effect data manipulation failed: " + e.getMessage());
+                }
+                return 1;
+        }))))));
         this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("data")
             .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
             .then(RequiredArgumentBuilder.<JSPlayer,String>argument("data", greedyString()).executes(context -> {

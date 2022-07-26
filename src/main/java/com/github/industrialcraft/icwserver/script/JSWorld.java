@@ -65,6 +65,10 @@ public class JSWorld {
         return world.data;
     }
 
+    public boolean lobby(){
+        return world.lobby;
+    }
+
     public World getInternal(){
         return this.world;
     }

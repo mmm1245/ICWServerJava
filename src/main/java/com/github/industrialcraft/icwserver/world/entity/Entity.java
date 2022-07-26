@@ -3,6 +3,7 @@ package com.github.industrialcraft.icwserver.world.entity;
 import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
+import com.github.industrialcraft.icwserver.script.JSStatusEffectData;
 import com.github.industrialcraft.icwserver.util.IJsonSerializable;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
@@ -12,27 +13,41 @@ import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
 import mikera.vectorz.Vector2;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public abstract class Entity implements IKillable, IJsonSerializable {
     protected Location location;
     protected boolean dead;
     protected float health;
     public final int id;
     public Object data;
-    public boolean frozen;
+    private final ArrayList<StatusEffect> statusEffects;
     public Entity(Location location) {
+        this.statusEffects = new ArrayList<>();
         this.location = location;
         this.dead = false;
         this.location.world().addEntity(this);
         this.health = getMaxHealth();
         this.id = location.world().getServer().generateIDEntity();
-        this.frozen = false;
     }
 
     public GameServer getServer(){
         return location.world().getServer();
     }
-
-    public abstract void tick();
+    public StatusEffect addStatusEffect(JSStatusEffectData type, int timeLeft){
+        StatusEffect statusEffect = new StatusEffect(type, timeLeft);
+        this.statusEffects.add(statusEffect);
+        return statusEffect;
+    }
+    public List<StatusEffect> getAllStatusEffects() {
+        return Collections.unmodifiableList(statusEffects);
+    }
+    public void tick(){
+        statusEffects.forEach(statusEffect -> statusEffect.tick(this));
+        statusEffects.removeIf(statusEffect -> statusEffect.timeLeft <= 0);
+    }
 
     public Location getLocation(){
         return this.location;

@@ -25,6 +25,7 @@ public class ScriptingManager {
     public final JSItemRegistry itemRegistry;
     public final JSEntityRegistry entityRegistry;
     public final JSTauntRegistry tauntRegistry;
+    public final JSStatusEffectRegistry statusEffectRegistry;
     public final JSGameServer gameServer;
     public final Events events;
     public ScriptingManager(JSGameServer gameServer, boolean debugEnabled)  {
@@ -45,6 +46,10 @@ public class ScriptingManager {
         this.tauntRegistry = new JSTauntRegistry();
         this.binding.put("tauntRegistry", this.tauntRegistry);
         this.binding.put("taunts", this.tauntRegistry.getTaunts());
+
+        this.statusEffectRegistry = new JSStatusEffectRegistry();
+        this.binding.put("statusEffectRegistry", this.statusEffectRegistry);
+        this.binding.put("statusEffects", this.statusEffectRegistry.getStatusEffects());
 
         this.binding.put("log", new JSLogger(debugEnabled));
 

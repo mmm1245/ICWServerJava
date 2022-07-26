@@ -47,6 +47,7 @@ public class EntityFromJS extends Entity {
 
     @Override
     public void tick() {
+        super.tick();
         if(physicsObject != null) {
             physicsObject.tickKnockback();
         }
@@ -75,7 +76,6 @@ public class EntityFromJS extends Entity {
         entity.setHealth(getHealth());
         entity.physicsObject = this.physicsObject.clone(entity);
         entity.dead = this.dead;
-        entity.frozen = this.frozen;
         //todo: copy inventory
         return entity;
     }

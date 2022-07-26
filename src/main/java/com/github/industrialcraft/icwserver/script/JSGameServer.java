@@ -7,7 +7,9 @@ import com.github.industrialcraft.icwserver.physics.Raytracer;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
+import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
+import com.github.industrialcraft.inventorysystem.ItemStack;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import java.util.Collections;
@@ -55,6 +57,12 @@ public class JSGameServer {
     }
     public void spawnExplosion(Location location, int power, int radius){
         location.world().spawnExplosion(location.x(), location.y(), power, radius);
+    }
+    public void spawnItem(Location location, ItemStack is){//todo:remove
+        new ItemStackEntity(location, is);
+    }
+    public void spawnItem(JSLocation location, ItemStack is){
+        new ItemStackEntity(location.getInternal(), is);
     }
 
     public List<JSPlayer> players() {

@@ -23,6 +23,12 @@ public class Item implements IItem {
         this.animationStateProvider = animationStateProvider;
         this.state2AssetStorage = state2AssetStorage;
     }
+    public ItemStack create(int count){
+        return new ItemStack(this, count);
+    }
+    public ItemStack create(){
+        return new ItemStack(this, 1);
+    }
     public boolean onAttackHandlerCall(PlayerEntity player, ItemStack stack, PlayerAttackMessage message){
         if(attackHandler != null) {
             attackHandler.call(stack, new JSPlayer(player), message);

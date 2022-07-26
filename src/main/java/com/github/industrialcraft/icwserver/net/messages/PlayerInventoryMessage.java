@@ -36,7 +36,8 @@ public class PlayerInventoryMessage extends Message {
 
         JsonArray jsonStatusEffects = new JsonArray();
         for(StatusEffect statusEffect : statusEffects){
-            jsonStatusEffects.add(statusEffect.type.type());
+            if(statusEffect.type.showToPlayer())
+                jsonStatusEffects.add(statusEffect.type.type());
         }
         json.add("statusEffects", jsonStatusEffects);
         return json;

@@ -1,7 +1,9 @@
 package com.github.industrialcraft.icwserver.physics;
 
+import com.github.industrialcraft.icwserver.script.JSEntity;
 import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import java.util.function.Predicate;
 
@@ -24,7 +26,7 @@ public class PhysicsObject {
         this.knockbackY = 0;
         this.knockbackFalloff = 0.1f;
         this.knockbackEffectivity = 1;
-        this.gravity = -2;
+        this.gravity = -6;
     }
     public boolean moveBy(float x, float y){
         float newX = entity.getLocation().x()+x;
@@ -44,10 +46,13 @@ public class PhysicsObject {
         this.knockbackY = 0;
     }
     public void tick(){
-        moveBy(this.knockbackX, this.knockbackY + (entity.getLocation().world().orientation==EWorldOrientation.SIDE?gravity:0));
+        moveBy(this.knockbackX, this.knockbackY);
         this.knockbackX -= this.knockbackX*this.knockbackFalloff;
         this.knockbackY -= this.knockbackY*this.knockbackFalloff;
-        this.gravity = -2;
+        if(this.knockbackY > this.gravity){
+            this.knockbackY += this.gravity/20;
+        }
+        this.gravity = -6;
     }
     public boolean canMoveTo (float x, float y){
         if(layer == EPhysicsLayer.PROJECTILE || layer == EPhysicsLayer.TRANSPARENT)
@@ -94,6 +99,17 @@ public class PhysicsObject {
                 return entity;
         }
         return null;
+    }
+    public void forEachCollision(boolean checkLayer, ScriptObjectMirror callback){
+        for(Entity entity : entity.getLocation().world().getEntities()){
+            if(this.entity.id == entity.id)
+                continue;
+            PhysicsObject physics2 = entity.getPhysicalObject();
+            if(physics2==null)
+                continue;
+            if((checkLayer?collides(this.layer, physics2.layer):true)&&Collisions.AABB(this.entity.getLocation().x(), this.entity.getLocation().y(), hitboxW, hitboxH, entity.getLocation().x(), entity.getLocation().y(), physics2.hitboxW, physics2.hitboxH))
+                callback.call(new JSEntity(this.entity), new JSEntity(entity));
+        }
     }
     public void resize(float hitboxW, float hitboxH){
         this.hitboxW = hitboxW;

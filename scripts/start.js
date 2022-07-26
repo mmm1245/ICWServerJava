@@ -3,6 +3,7 @@ function stoneCallback(){
 }
 
 var orb = entityRegistry.createTemplate("ORB", 20);
+orb.withPhysicsData(10, 10, EPhysicsLayers.OBJECT);
 orb.withOnSpawn((function() {
     //this.data = {cnt:0};
 }));

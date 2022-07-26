@@ -1,5 +1,6 @@
 package com.github.industrialcraft.icwserver.physics;
 
+import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 
 import java.util.function.Predicate;
@@ -13,6 +14,7 @@ public class PhysicsObject {
     public float knockbackY;
     public float knockbackFalloff;
     public float knockbackEffectivity;
+    public float gravity;
     public PhysicsObject(Entity entity, float hitboxW, float hitboxH, EPhysicsLayer layer) {
         this.entity = entity;
         this.hitboxW = hitboxW;
@@ -22,6 +24,7 @@ public class PhysicsObject {
         this.knockbackY = 0;
         this.knockbackFalloff = 0.1f;
         this.knockbackEffectivity = 1;
+        this.gravity = -2;
     }
     public boolean moveBy(float x, float y){
         float newX = entity.getLocation().x()+x;
@@ -40,8 +43,8 @@ public class PhysicsObject {
         this.knockbackX = 0;
         this.knockbackY = 0;
     }
-    public void tickKnockback(){
-        moveBy(this.knockbackX, this.knockbackY);
+    public void tick(){
+        moveBy(this.knockbackX, this.knockbackY + (entity.getLocation().world().orientation==EWorldOrientation.SIDE?gravity:0));
         this.knockbackX -= this.knockbackX*this.knockbackFalloff;
         this.knockbackY -= this.knockbackY*this.knockbackFalloff;
     }

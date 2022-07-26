@@ -9,6 +9,7 @@ import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.script.JSPlayer;
 import com.github.industrialcraft.icwserver.script.JSTauntRegistry;
+import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.util.taunt.RunningTaunt;
 import com.github.industrialcraft.icwserver.util.taunt.Taunt;
@@ -43,6 +44,7 @@ public class PlayerEntity extends Entity {
     @Override
     public void tick() {
         this.getPlayerAbilities().reset();
+        this.getPlayerAbilities().topDown = this.getLocation().world().orientation==EWorldOrientation.TOP_DOWN;
         super.tick();
         if(openedInventory != null && (openedInventory.isDead() || (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50)))
             openedInventory = null;

@@ -5,7 +5,6 @@ import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.util.Location;
-import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
 
@@ -21,9 +20,7 @@ public class ItemStackEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        this.physicsObject.tickKnockback();
-        //todo:check world orientation
-        this.physicsObject.moveBy(0, -1);
+        this.physicsObject.tick();
     }
 
     @Override

@@ -54,14 +54,14 @@ public class GameServer extends Thread{
         this.scriptingManager = new ScriptingManager(new JSGameServer(this), true);
         this.scriptingManager.runScripts(files);
         getEvents().START_SERVER.call();
-        this.worlds.add(new World(true, this));
+        this.worlds.add(new World(true, EWorldOrientation.SIDE, this));  //todo: lobby orientation
         getEvents().CREATE_WORLD.call(new JSWorld(this.worlds.get(0)));
     }
     public TickManager getTickManager() {
         return tickManager;
     }
-    public World createWorld(){
-        World world = new World(false, this);
+    public World createWorld(EWorldOrientation orientation){
+        World world = new World(false, orientation, this);
         this.worldsToAdd.add(world);
         getEvents().CREATE_WORLD.call(new JSWorld(world));
         return world;

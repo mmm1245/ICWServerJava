@@ -4,6 +4,7 @@ import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.script.JSEntity;
 import com.github.industrialcraft.icwserver.script.JSEntityData;
+import com.github.industrialcraft.icwserver.script.JSPlayer;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
@@ -48,7 +49,7 @@ public class EntityFromJS extends Entity {
     public void tick() {
         super.tick();
         if(physicsObject != null) {
-            physicsObject.tickKnockback();
+            physicsObject.tick();
         }
         if(entityData.tickMethod != null)
             entityData.tickMethod.call(new JSEntity(this));
@@ -63,7 +64,7 @@ public class EntityFromJS extends Entity {
     @Override
     public boolean onPlayerInteract(PlayerEntity player, InteractEntityMessage message) {
         if(entityData.onPlayerInteractMethod != null){
-            entityData.onPlayerInteractMethod.call(new JSEntity(this), player, message);
+            entityData.onPlayerInteractMethod.call(new JSEntity(this), new JSPlayer(player), message);
             return true;
         }
         return false;

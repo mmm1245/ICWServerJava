@@ -9,7 +9,7 @@ commandManager.register("duel",(function(player1id,player2id){
         this.sendChatMessage("player2 not found");
         return;
     }
-    var duelWorld = gameServer.createWorld();
+    var duelWorld = gameServer.createWorld(EWorldOrientation.SIDE);
     player1.teleport(duelWorld.location(0, 0));
     player2.teleport(duelWorld.location(80, 0));
     duelWorld.setData({type:"duel",player1:player1id,player2:player2id});

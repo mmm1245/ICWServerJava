@@ -111,11 +111,17 @@ public class CommandManager {
                     return 1;
                 }))
         );
-        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("createworld").executes(context -> {
-            World world = context.getSource().getInternal().getServer().createWorld();
-            context.getSource().sendChatMessage(String.format("World created with id %s", world.getId()));
-            return 1;
-        }));
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("createworld")
+            .then(RequiredArgumentBuilder.<JSPlayer,String>argument("orientation", string()).executes(context -> {
+                EWorldOrientation worldOrientation = EWorldOrientation.byName(getString(context, "orientation"));
+                if(worldOrientation == null){
+                    context.getSource().sendChatMessage("Orientation not valid");
+                    return 1;
+                }
+                World world = context.getSource().getInternal().getServer().createWorld(worldOrientation);
+                context.getSource().sendChatMessage(String.format("World created with id %s", world.getId()));
+                return 1;
+        })));
         this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("killworld")
             .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer()).executes(context -> {
                 World world = context.getSource().getInternal().getServer().worldById(getInteger(context, "id"));

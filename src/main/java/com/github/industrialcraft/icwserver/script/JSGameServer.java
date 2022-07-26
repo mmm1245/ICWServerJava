@@ -4,6 +4,7 @@ import com.github.industrialcraft.icwserver.GameServer;
 import com.github.industrialcraft.icwserver.net.ClientConnection;
 import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
+import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
@@ -31,8 +32,8 @@ public class JSGameServer {
         else
             return new JSPlayer(player);
     }
-    public JSWorld createWorld(){
-        return new JSWorld(this.gameServer.createWorld());
+    public JSWorld createWorld(EWorldOrientation worldOrientation){
+        return new JSWorld(this.gameServer.createWorld(worldOrientation));
     }
     public JSWorld worldById(int id){
         return new JSWorld(this.gameServer.worldById(id));
@@ -54,9 +55,6 @@ public class JSGameServer {
     }
     public void spawnExplosion(JSLocation location, int power, int radius){
         location.world().getInternal().spawnExplosion(location.x(), location.y(), power, radius);
-    }
-    public void spawnExplosion(Location location, int power, int radius){
-        location.world().spawnExplosion(location.x(), location.y(), power, radius);
     }
     public void spawnItem(JSLocation location, ItemStack is){
         new ItemStackEntity(location.getInternal(), is);

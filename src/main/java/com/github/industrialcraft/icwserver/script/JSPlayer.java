@@ -17,8 +17,8 @@ public class JSPlayer extends JSEntity{
         super(player);
         this.player = player;
     }
-    public void openInventory(Entity entity){
-        this.player.openInventory(entity);
+    public void openInventory(JSEntity entity){
+        this.player.openInventory(entity.getInternal());
     }
     public void closeInventory(){
         this.player.closeInventory();

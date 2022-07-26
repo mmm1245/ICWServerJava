@@ -98,4 +98,8 @@ public class JSEntity {
         }
         return null;
     }
+
+    public Entity getInternal(){
+        return this.entity;
+    }
 }

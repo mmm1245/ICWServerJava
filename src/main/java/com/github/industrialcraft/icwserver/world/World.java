@@ -1,6 +1,7 @@
 package com.github.industrialcraft.icwserver.world;
 
 import com.github.industrialcraft.icwserver.GameServer;
+import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
@@ -19,10 +20,12 @@ public class World {
     protected final ArrayList<Entity> entities;
     protected final ArrayList<Particle> particles;
     protected final GameServer server;
+    public EWorldOrientation orientation;
     protected final int id;
     public Object data;
-    public World(boolean lobby, GameServer server) {
+    public World(boolean lobby, EWorldOrientation orientation, GameServer server) {
         this.id = server.generateIDWorld();
+        this.orientation = orientation;
         this.server = server;
         this.removed = false;
         this.lobby = lobby;

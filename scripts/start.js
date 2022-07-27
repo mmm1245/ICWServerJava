@@ -54,9 +54,26 @@ statusEffectRegistry.createTemplate("SPAM").withOnTick((function(entity) {
 })).register();
 
 events.PLAYER_TICK.register((function(player) {
-   player.setPlayerState(playerStates.IDLE);
+   var dX = undefined;
+   if(player.getData() != null){
+        dX = player.getData().xPosLast;
+   } else {
+    player.setData({});
+   }
+   if(dX != null){
+        if(dX !== player.location().x()){
+            player.setPlayerState(playerStates.WALK);
+        } else {
+            player.setPlayerState(playerStates.IDLE);
+        }
+   } else {
+        player.setPlayerState(playerStates.IDLE);
+    }
+   player.setData(Object.assign(player.getData(), {xPosLast:player.location().x()}));
 }));
 
 playerStateRegistry.createTemplate("IDLE").addPart("assets/player/idle1.png", 5).addPart("assets/player/idle2.png", 5).register();
+
+playerStateRegistry.createTemplate("WALK").addPart("assets/player/w1.png", 3).addPart("assets/player/w2.png", 3).addPart("assets/player/w3.png", 3).addPart("assets/player/w4.png", 3).addPart("assets/player/w5.png", 3).addPart("assets/player/w6.png", 3).addPart("assets/player/w7.png", 3).register();
 
 playerStateRegistry.createTemplate("WIN").addPart("assets/taunts/win/win_1.png", 20).addPart("assets/taunts/win/win_2.png",10).markMotionBlocking().register();

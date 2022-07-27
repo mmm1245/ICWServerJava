@@ -14,7 +14,7 @@ public class CancellableEvent {
         registered.add(scriptLambda);
     }
 
-    protected boolean call(Object[] data){
+    public boolean call(Object... data){
         Cancellable cancellable = new Cancellable();
         for(ScriptObjectMirror scriptObject : registered){
             scriptObject.call(cancellable, data);

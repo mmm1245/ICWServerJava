@@ -206,6 +206,25 @@ public class CommandManager {
                     world.playSoundEffect(soundEffect, getInteger(context, "x"), getInteger(context, "y"));
                     return 1;
                 }))))));
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("ride")
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("ridden", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("passenger", integer()).executes(context -> {
+                    Entity ridden = context.getSource().getInternal().getServer().entityById(getInteger(context, "ridden"));
+                    if(ridden == null){
+                        context.getSource().sendChatMessage("Ridden entity not found");
+                        return 1;
+                    }
+                    Entity passenger = context.getSource().getInternal().getServer().entityById(getInteger(context, "passenger"));
+                    if(passenger == null){
+                        context.getSource().sendChatMessage("Passenger entity not found");
+                        return 1;
+                    }
+                    if(!ridden.trySetPassenger(passenger)){
+                        context.getSource().sendChatMessage("Couldnt make passenger ride");
+                        return 1;
+                    }
+                    return 1;
+                }))));
         this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("data")
             .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
             .then(RequiredArgumentBuilder.<JSPlayer,String>argument("data", greedyString()).executes(context -> {

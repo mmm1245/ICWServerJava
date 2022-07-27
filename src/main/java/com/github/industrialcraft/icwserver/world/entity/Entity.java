@@ -8,7 +8,6 @@ import com.github.industrialcraft.icwserver.util.IJsonSerializable;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import com.github.industrialcraft.icwserver.world.entity.data.IKillable;
-import com.github.industrialcraft.icwserver.world.entity.data.IPlayerInteractHandler;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.google.gson.JsonObject;
 import mikera.vectorz.Vector2;
@@ -24,6 +23,7 @@ public abstract class Entity implements IKillable, IJsonSerializable {
     public final int id;
     public Object data;
     private final ArrayList<StatusEffect> statusEffects;
+    public Entity riddenEntity;
     public Entity(Location location) {
         this.statusEffects = new ArrayList<>();
         this.location = location;
@@ -31,6 +31,7 @@ public abstract class Entity implements IKillable, IJsonSerializable {
         this.location.world().addEntity(this);
         this.health = getMaxHealth();
         this.id = location.world().getServer().generateIDEntity();
+        this.riddenEntity = null;
     }
 
     public GameServer getServer(){
@@ -47,6 +48,9 @@ public abstract class Entity implements IKillable, IJsonSerializable {
     public void tick(){
         statusEffects.forEach(statusEffect -> statusEffect.tick(this));
         statusEffects.removeIf(statusEffect -> statusEffect.timeLeft <= 0);
+
+        if(riddenEntity != null && riddenEntity.isDead())
+            riddenEntity = null;
     }
 
     public Location getLocation(){
@@ -76,6 +80,13 @@ public abstract class Entity implements IKillable, IJsonSerializable {
             vector.multiply(magnitude);
             po.applyKnockback((float)vector.x, (float)vector.y);
         }
+    }
+
+    public boolean trySetPassenger(Entity entity){
+        return false;
+    }
+    public Entity getPassenger(){
+        return null;
     }
 
     @Override

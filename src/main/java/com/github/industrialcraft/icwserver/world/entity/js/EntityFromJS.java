@@ -1,11 +1,13 @@
 package com.github.industrialcraft.icwserver.world.entity.js;
 
 import com.github.industrialcraft.icwserver.net.messages.InteractEntityMessage;
+import com.github.industrialcraft.icwserver.net.messages.PlayerPassengerDataMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.script.JSEntity;
 import com.github.industrialcraft.icwserver.script.JSEntityData;
 import com.github.industrialcraft.icwserver.script.JSPlayer;
 import com.github.industrialcraft.icwserver.util.Location;
+import com.github.industrialcraft.icwserver.util.PassengerData;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.ItemStackEntity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
@@ -19,6 +21,7 @@ public class EntityFromJS extends Entity {
     private JSEntityData entityData;
     private PhysicsObject physicsObject;
     private Inventory inventory;
+    private Entity passenger;
     public EntityFromJS(JSEntityData entitiyData, Location location, Object data) {
         super(location);
         this.entityData = entitiyData;
@@ -34,6 +37,7 @@ public class EntityFromJS extends Entity {
         this.data = data;
         if(entitiyData.spawnMethod != null)
             entitiyData.spawnMethod.call(new JSEntity(this));
+        this.passenger = null;
     }
 
     public boolean modData(Object data){
@@ -53,6 +57,15 @@ public class EntityFromJS extends Entity {
         }
         if(entityData.tickMethod != null)
             entityData.tickMethod.call(new JSEntity(this));
+
+        if(passenger != null){
+            PassengerData passengerData = entityData.passengerData;
+            if(passenger instanceof PlayerEntity player){
+                player.getConnection().send(new PlayerPassengerDataMessage(this.id, passengerData.offsetX, passengerData.offsetY));
+            } else {
+                passenger.teleport(getLocation().x()+passengerData.offsetX, getLocation().y()+passengerData.offsetY);
+            }
+        }
     }
     @Override
     public void onDeath() {
@@ -68,6 +81,28 @@ public class EntityFromJS extends Entity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean trySetPassenger(Entity entity) {//todo:check if it makes sense im too tired
+        if(this.passenger != null)
+            this.passenger.riddenEntity = null;
+        if(entity == null){
+            this.passenger = null;
+            return true;
+        }
+        if(entityData.passengerData == null){
+            this.passenger = null;
+            return false;
+        } else {
+            this.passenger = entity;
+            entity.riddenEntity = this;
+            return true;
+        }
+    }
+    @Override
+    public Entity getPassenger() {
+        return this.passenger;
     }
 
     @Override

@@ -31,8 +31,8 @@ public class JSEntity {
     public JSLocation location(){
         return new JSLocation(this.entity.getLocation());
     }
-    public void teleport(Location location){
-        this.entity.teleport(location);
+    public void teleport(JSLocation location){
+        this.entity.teleport(location.getInternal());
     }
     public void teleport(float x, float y){
         this.entity.teleport(x, y);
@@ -81,6 +81,12 @@ public class JSEntity {
     }
     public int getId(){
         return entity.id;
+    }
+    public boolean trySetPassenger(JSEntity entity) {
+        return this.entity.trySetPassenger(entity.getInternal());
+    }
+    public JSEntity getPassenger() {
+        return new JSEntity(this.entity.getPassenger());
     }
 
     public JSPlayer toPlayerIP(){

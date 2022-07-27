@@ -19,6 +19,7 @@ public class MessageRegistry {
         MessageRegistry.messageRegistry.put(CustomDataMessage.TYPE, stream -> new CustomDataMessage(stream));
         MessageRegistry.messageRegistry.put(ChatMessage.TYPE, stream -> new ChatMessage(stream));
         MessageRegistry.messageRegistry.put(PlayTauntMessage.TYPE, stream -> new PlayTauntMessage(stream));
+        MessageRegistry.messageRegistry.put(PlayerDismountMessage.TYPE, stream -> new PlayerDismountMessage(stream));
     }
     public static Message create(JsonObject json){
         JsonElement typeElement = json.get("type");

@@ -1,10 +1,7 @@
 package com.github.industrialcraft.icwserver.world.entity;
 
 import com.github.industrialcraft.icwserver.net.ClientConnection;
-import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
-import com.github.industrialcraft.icwserver.net.messages.ClientPlayerPositionMessage;
-import com.github.industrialcraft.icwserver.net.messages.KnockbackDataMessage;
-import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
+import com.github.industrialcraft.icwserver.net.messages.*;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.script.JSPlayer;
@@ -52,6 +49,10 @@ public class PlayerEntity extends Entity {
             runningPlayerState.next();
             if(runningPlayerState.isFinished())
                 runningPlayerState = null;
+        }
+
+        if(riddenEntity == null){
+            getConnection().send(new PlayerPassengerDataMessage(-1, 0, 0));
         }
 
         getServer().getEvents().PLAYER_TICK.call(new JSPlayer(this));
@@ -153,6 +154,10 @@ public class PlayerEntity extends Entity {
         getServer().getEvents().PLAYER_DEATH.call(new JSPlayer(this));
         inventory.dropAll();
         //todo: drop hand stack
+        if(riddenEntity != null){
+            riddenEntity.trySetPassenger(null);
+            riddenEntity = null;
+        }
         inventory.overflow(handItemStack);
         handItemStack = null;
         closeInventory();

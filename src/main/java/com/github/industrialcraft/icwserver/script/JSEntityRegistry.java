@@ -3,6 +3,7 @@ package com.github.industrialcraft.icwserver.script;
 import com.github.industrialcraft.icwserver.inventory.data.InventoryCreationData;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObjectDataHolder;
+import com.github.industrialcraft.icwserver.util.PassengerData;
 import com.github.industrialcraft.icwserver.util.State2AssetStorage;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
@@ -36,6 +37,7 @@ public class JSEntityRegistry {
         private PhysicsObjectDataHolder physicsData;
         private State2AssetStorage state2AssetStorage;
         private InventoryCreationData inventoryCreationData;
+        private PassengerData passengerData;
         public EntityTemplate(String id, int maxHealth) {
             this.id = id;
             this.maxHealth = maxHealth;
@@ -76,11 +78,15 @@ public class JSEntityRegistry {
             this.inventoryCreationData = new InventoryCreationData(size);
             return this;
         }
+        public EntityTemplate withPassengerData(int offsetX, int offsetY){
+            this.passengerData = new PassengerData(offsetX, offsetY);
+            return this;
+        }
 
         public JSEntityData register(){
             if(entities.containsKey(id))
                 throw new IllegalStateException(id + " already registered");
-            JSEntityData entityData = new JSEntityData(id, maxHealth, spawnMethod, tickMethod, onDeathMethod, onPlayerInteractMethod, damageTypeModifierMethod, animationStateProvider, physicsData, state2AssetStorage, inventoryCreationData);
+            JSEntityData entityData = new JSEntityData(id, maxHealth, spawnMethod, tickMethod, onDeathMethod, onPlayerInteractMethod, damageTypeModifierMethod, animationStateProvider, physicsData, state2AssetStorage, inventoryCreationData, passengerData);
             entities.put(id, entityData);
             return entityData;
         }

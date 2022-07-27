@@ -7,10 +7,7 @@ import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.net.WSServer;
 import com.github.industrialcraft.icwserver.net.messages.*;
 import com.github.industrialcraft.icwserver.physics.Raytracer;
-import com.github.industrialcraft.icwserver.script.JSGameServer;
-import com.github.industrialcraft.icwserver.script.JSPlayer;
-import com.github.industrialcraft.icwserver.script.JSWorld;
-import com.github.industrialcraft.icwserver.script.ScriptingManager;
+import com.github.industrialcraft.icwserver.script.*;
 import com.github.industrialcraft.icwserver.script.event.Events;
 import com.github.industrialcraft.icwserver.util.*;
 import com.github.industrialcraft.icwserver.util.playerState.PlayerState;
@@ -227,6 +224,14 @@ public class GameServer extends Thread{
                         PlayerState taunt = getScriptingManager().playerStateRegistry.getPlayerStates().get(msg.taunt);
                         if(taunt != null)
                             connection.player.setPlayerStateWithResetting(taunt);
+                    }
+                }
+                if(pMsg instanceof PlayerDismountMessage msg){
+                    if (connection.player.riddenEntity != null) {
+                        if(!getEvents().PLAYER_DISMOUNT.call(new JSPlayer(connection.player), new JSEntity(connection.player.riddenEntity))) {
+                            connection.player.riddenEntity.trySetPassenger(null);
+                            connection.player.riddenEntity = null;
+                        }
                     }
                 }
             }

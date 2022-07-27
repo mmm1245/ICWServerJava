@@ -8,11 +8,7 @@ import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
 import com.google.gson.JsonParser;
 import org.java_websocket.WebSocket;
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.handshake.HandshakeImpl1Server;
-import org.java_websocket.handshake.ServerHandshakeBuilder;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
@@ -39,7 +35,7 @@ public class WSServer extends WebSocketServer
         ClientConnection clientConnection = new ClientConnection(conn);
         conn.setAttachment(clientConnection);
         this.connections.add(clientConnection);
-        clientConnection.send(new AssetDataMessage(gameServer.getScriptingManager().entityRegistry, gameServer.getScriptingManager().itemRegistry, gameServer.getScriptingManager().tauntRegistry));
+        clientConnection.send(new AssetDataMessage(gameServer.getScriptingManager().entityRegistry, gameServer.getScriptingManager().itemRegistry, gameServer.getScriptingManager().tauntRegistry, gameServer.getScriptingManager().soundEffectRegistry));
         System.out.println("new connection");
     }
 

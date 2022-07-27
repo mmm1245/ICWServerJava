@@ -187,6 +187,25 @@ public class CommandManager {
                 }
                 return 1;
         }))))));
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("soundeffect")
+                .then(RequiredArgumentBuilder.<JSPlayer,String>argument("id", string())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("x", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("y", integer())
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("w", integer()).executes(context -> {
+                    ScriptingManager scriptingManager = context.getSource().getInternal().getServer().getScriptingManager();
+                    JSSoundEffectRegistry.SoundEffect soundEffect = scriptingManager.soundEffectRegistry.getSoundEffects().get(getString(context, "id"));
+                    if(soundEffect == null){
+                        context.getSource().sendChatMessage("Sound effect not found");
+                        return 1;
+                    }
+                    World world = context.getSource().getInternal().getServer().worldById(getInteger(context, "w"));
+                    if(world == null){
+                        context.getSource().sendChatMessage("World not found");
+                        return 1;
+                    }
+                    world.playSoundEffect(soundEffect, getInteger(context, "x"), getInteger(context, "y"));
+                    return 1;
+                }))))));
         this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("data")
             .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
             .then(RequiredArgumentBuilder.<JSPlayer,String>argument("data", greedyString()).executes(context -> {

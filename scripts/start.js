@@ -47,6 +47,8 @@ var taskid3 = scheduler.times((function() {
 log.info("task3 id is %s", taskid3);*/
 //scheduler.killTask(taskid);
 
+soundEffectRegistry.register("CLAP", "assets/soundEffects/clap.mp3");
+
 statusEffectRegistry.createTemplate("SPAM").withOnTick((function(entity) {
    log.info("spam:%s", entity);
 })).register();

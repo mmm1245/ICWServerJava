@@ -60,6 +60,9 @@ public class JSGameServer {
     public Particle spawnParticle(String type, JSLocation location, int lifetime){
         return location.world().spawnParticle(type, (int) location.x(), (int) location.y(), lifetime);
     }
+    public void playSoundEffect(JSSoundEffectRegistry.SoundEffect soundEffect, JSLocation location){
+        location.world().getInternal().playSoundEffect(soundEffect, (int) location.x(), (int) location.y());
+    }
     public void spawnItem(JSLocation location, ItemStack is){
         new ItemStackEntity(location.getInternal(), is);
     }

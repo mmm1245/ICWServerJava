@@ -1,6 +1,8 @@
 package com.github.industrialcraft.icwserver.world;
 
 import com.github.industrialcraft.icwserver.GameServer;
+import com.github.industrialcraft.icwserver.net.messages.SoundEffectMessage;
+import com.github.industrialcraft.icwserver.script.JSSoundEffectRegistry;
 import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.util.Location;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
@@ -54,6 +56,9 @@ public class World {
     }
     public void addParticle(Particle particle){
         this.particles.add(particle);
+    }
+    public void playSoundEffect(JSSoundEffectRegistry.SoundEffect soundEffect, int x, int y){
+        getServer().getWSServer().broadcastInWorld(new SoundEffectMessage(soundEffect, x, y), this);
     }
     public void spawnExplosion(float x, float y, float power, float radius){
         addParticle(new Particle("explosion", 60, x, y).addNumber("power", power).addNumber("radius", radius));

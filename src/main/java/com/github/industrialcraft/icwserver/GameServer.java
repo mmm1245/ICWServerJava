@@ -13,7 +13,7 @@ import com.github.industrialcraft.icwserver.script.JSWorld;
 import com.github.industrialcraft.icwserver.script.ScriptingManager;
 import com.github.industrialcraft.icwserver.script.event.Events;
 import com.github.industrialcraft.icwserver.util.*;
-import com.github.industrialcraft.icwserver.util.taunt.Taunt;
+import com.github.industrialcraft.icwserver.util.playerState.PlayerState;
 import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.*;
@@ -222,11 +222,11 @@ public class GameServer extends Thread{
                 }
                 if(pMsg instanceof PlayTauntMessage msg){
                     if(msg.isStopMessage()){
-                        connection.player.stopTaunt();
+                        connection.player.setPlayerState(null);
                     } else {
-                        Taunt taunt = getScriptingManager().tauntRegistry.getTaunts().get(msg.taunt);
+                        PlayerState taunt = getScriptingManager().playerStateRegistry.getPlayerStates().get(msg.taunt);
                         if(taunt != null)
-                            connection.player.startTaunt(taunt);
+                            connection.player.setPlayerStateWithResetting(taunt);
                     }
                 }
             }

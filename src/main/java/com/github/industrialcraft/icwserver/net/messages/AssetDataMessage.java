@@ -3,7 +3,7 @@ package com.github.industrialcraft.icwserver.net.messages;
 import com.github.industrialcraft.icwserver.inventory.Item;
 import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.script.*;
-import com.github.industrialcraft.icwserver.util.taunt.Taunt;
+import com.github.industrialcraft.icwserver.util.playerState.PlayerState;
 import com.google.gson.JsonObject;
 
 public class AssetDataMessage extends Message {
@@ -11,9 +11,9 @@ public class AssetDataMessage extends Message {
 
     public final JSEntityRegistry entityRegistry;
     public final JSItemRegistry itemRegistry;
-    public final JSTauntRegistry tauntRegistry;
+    public final JSPlayerStateRegistry tauntRegistry;
     public final JSSoundEffectRegistry soundEffectRegistry;
-    public AssetDataMessage(JSEntityRegistry entityRegistry, JSItemRegistry itemRegistry, JSTauntRegistry tauntRegistry, JSSoundEffectRegistry soundEffectRegistry) {
+    public AssetDataMessage(JSEntityRegistry entityRegistry, JSItemRegistry itemRegistry, JSPlayerStateRegistry tauntRegistry, JSSoundEffectRegistry soundEffectRegistry) {
         this.entityRegistry = entityRegistry;
         this.itemRegistry = itemRegistry;
         this.tauntRegistry = tauntRegistry;
@@ -35,7 +35,7 @@ public class AssetDataMessage extends Message {
         json.add("items", jsonItems);
 
         JsonObject jsonPlayerStates = new JsonObject();
-        for(Taunt taunt : tauntRegistry.getTaunts().values()){
+        for(PlayerState taunt : tauntRegistry.getPlayerStates().values()){
             for(int i = 0;i < taunt.parts.size();i++){
                 jsonPlayerStates.addProperty(taunt.id + "_" + i, taunt.parts.get(i).asset());
             }

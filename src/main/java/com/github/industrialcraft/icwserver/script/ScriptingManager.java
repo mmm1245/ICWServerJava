@@ -5,12 +5,7 @@ import com.github.industrialcraft.icwserver.script.event.Events;
 import com.github.industrialcraft.icwserver.util.CommandManager;
 import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
-import org.openjdk.nashorn.api.scripting.NashornScriptEngine;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
-import org.openjdk.nashorn.internal.objects.Global;
-import org.openjdk.nashorn.internal.parser.JSONParser;
-import org.openjdk.nashorn.internal.runtime.Context;
-import org.openjdk.nashorn.internal.runtime.JSONFunctions;
 
 import javax.script.*;
 import java.io.File;
@@ -25,7 +20,7 @@ public class ScriptingManager {
 
     public final JSItemRegistry itemRegistry;
     public final JSEntityRegistry entityRegistry;
-    public final JSTauntRegistry tauntRegistry;
+    public final JSPlayerStateRegistry playerStateRegistry;
     public final JSStatusEffectRegistry statusEffectRegistry;
     public final JSSoundEffectRegistry soundEffectRegistry;
     public final JSGameServer gameServer;
@@ -45,9 +40,9 @@ public class ScriptingManager {
         this.binding.put("entityRegistry", this.entityRegistry);
         this.binding.put("entities", this.entityRegistry.getEntities());
 
-        this.tauntRegistry = new JSTauntRegistry();
-        this.binding.put("tauntRegistry", this.tauntRegistry);
-        this.binding.put("taunts", this.tauntRegistry.getTaunts());
+        this.playerStateRegistry = new JSPlayerStateRegistry();
+        this.binding.put("playerStateRegistry", this.playerStateRegistry);
+        this.binding.put("playerStates", this.playerStateRegistry.getPlayerStates());
 
         this.statusEffectRegistry = new JSStatusEffectRegistry();
         this.binding.put("statusEffectRegistry", this.statusEffectRegistry);

@@ -4,6 +4,8 @@ import com.github.industrialcraft.icwserver.net.Message;
 import com.github.industrialcraft.icwserver.net.messages.ChatMessage;
 import com.github.industrialcraft.icwserver.net.messages.CustomDataMessage;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
+import com.github.industrialcraft.icwserver.util.playerState.PlayerState;
+import com.github.industrialcraft.icwserver.util.playerState.RunningPlayerState;
 import com.github.industrialcraft.icwserver.world.entity.Entity;
 import com.github.industrialcraft.icwserver.world.entity.PlayerAbilities;
 import com.github.industrialcraft.icwserver.world.entity.PlayerEntity;
@@ -77,6 +79,15 @@ public class JSPlayer extends JSEntity{
     }
     public PlayerAbilities playerAbilities(){
         return player.getPlayerAbilities();
+    }
+    public void setPlayerState(PlayerState state){
+        this.player.setPlayerState(state);
+    }
+    public void setPlayerStateWithResetting(PlayerState state){
+        this.player.setPlayerStateWithResetting(state);
+    }
+    public RunningPlayerState playerState() {
+        return this.player.getPlayerState();
     }
     public PlayerEntity getInternal() {
         return this.player;

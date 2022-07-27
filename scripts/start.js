@@ -53,4 +53,10 @@ statusEffectRegistry.createTemplate("SPAM").withOnTick((function(entity) {
    log.info("spam:%s", entity);
 })).register();
 
-tauntRegistry.createTemplate("WIN").addPart("assets/taunts/win/win_1.png", 20).addPart("assets/taunts/win/win_2.png",10).register();
+events.PLAYER_TICK.register((function(player) {
+   player.setPlayerState(playerStates.IDLE);
+}));
+
+playerStateRegistry.createTemplate("IDLE").addPart("assets/player/idle1.png", 5).addPart("assets/player/idle2.png", 5).register();
+
+playerStateRegistry.createTemplate("WIN").addPart("assets/taunts/win/win_1.png", 20).addPart("assets/taunts/win/win_2.png",10).markMotionBlocking().register();

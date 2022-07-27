@@ -11,4 +11,5 @@ public class Events {
     public final Event START_SERVER = new Event();
     public final Event CUSTOM_MESSAGE_RECEIVED = new Event();
     public final Event PLAYER_DEATH = new Event();
+    public final Event PLAYER_TICK = new Event();
 }

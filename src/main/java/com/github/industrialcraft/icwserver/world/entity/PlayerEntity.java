@@ -8,11 +8,10 @@ import com.github.industrialcraft.icwserver.net.messages.TeleportPlayerMessage;
 import com.github.industrialcraft.icwserver.physics.EPhysicsLayer;
 import com.github.industrialcraft.icwserver.physics.PhysicsObject;
 import com.github.industrialcraft.icwserver.script.JSPlayer;
-import com.github.industrialcraft.icwserver.script.JSTauntRegistry;
 import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.util.Location;
-import com.github.industrialcraft.icwserver.util.taunt.RunningTaunt;
-import com.github.industrialcraft.icwserver.util.taunt.Taunt;
+import com.github.industrialcraft.icwserver.util.playerState.RunningPlayerState;
+import com.github.industrialcraft.icwserver.util.playerState.PlayerState;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 import com.google.gson.JsonObject;
@@ -24,7 +23,7 @@ public class PlayerEntity extends Entity {
     private Entity openedInventory;
     private ItemStack handItemStack;
     private PlayerAbilities playerAbilities;
-    private RunningTaunt runningTaunt;
+    private RunningPlayerState runningPlayerState;
     public PlayerEntity(Location location, ClientConnection connection) {
         super(location);
         this.connection = connection;
@@ -39,7 +38,7 @@ public class PlayerEntity extends Entity {
         }, this);
 
         this.playerAbilities = new PlayerAbilities();
-        this.runningTaunt = null;
+        this.runningPlayerState = null;
     }
     @Override
     public void tick() {
@@ -49,18 +48,20 @@ public class PlayerEntity extends Entity {
         if(openedInventory != null && (openedInventory.isDead() || (openedInventory.getInventory()==null||openedInventory.getLocation().distanceToNS(getLocation())>50*50)))
             openedInventory = null;
 
-        if(runningTaunt != null){
-            runningTaunt.next();
-            if(runningTaunt.isFinished())
-                runningTaunt = null;
+        if(runningPlayerState != null){
+            runningPlayerState.next();
+            if(runningPlayerState.isFinished())
+                runningPlayerState = null;
         }
+
+        getServer().getEvents().PLAYER_TICK.call(new JSPlayer(this));
     }
 
     @Override
     public JsonObject toJson() {
         JsonObject json = super.toJson();
         json.addProperty("name", connection.profile.name());
-        json.addProperty("state", runningTaunt==null?"default":runningTaunt.getState());
+        json.addProperty("state", runningPlayerState ==null?"default": runningPlayerState.getStringState());
         return json;
     }
 
@@ -73,11 +74,23 @@ public class PlayerEntity extends Entity {
         return playerAbilities;
     }
 
-    public void startTaunt(Taunt taunt){
-        this.runningTaunt = new RunningTaunt(taunt);
+    public void setPlayerState(PlayerState state){
+        if(state == null)
+            this.runningPlayerState = null;
+        else {
+            if(this.runningPlayerState == null || this.runningPlayerState.getState() != state)
+                this.runningPlayerState = new RunningPlayerState(state);
+        }
     }
-    public void stopTaunt(){
-        this.runningTaunt = null;
+    public void setPlayerStateWithResetting(PlayerState state){
+        if(state == null)
+            this.runningPlayerState = null;
+        else
+            this.runningPlayerState = new RunningPlayerState(state);
+    }
+
+    public RunningPlayerState getPlayerState() {
+        return runningPlayerState;
     }
 
     public void openInventory(Entity entity){

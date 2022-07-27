@@ -25,22 +25,15 @@ public class JSWorld {
     public void remove(){
         world.remove();
     }
-    public List<EntityFromJS> entities(){
+    public List<JSEntity> entities(){
         return world.getEntities().stream()
-                .filter(entity -> (entity instanceof EntityFromJS))
-                .map(entity -> ((EntityFromJS)entity))
+                .map(entity -> new JSEntity(entity))
                 .collect(Collectors.toUnmodifiableList());
     }
     public List<JSPlayer> players(){
         return world.getEntities().stream()
                 .filter(entity -> (entity instanceof PlayerEntity))
                 .map(entity -> new JSPlayer((PlayerEntity)entity))
-                .collect(Collectors.toUnmodifiableList());
-    }
-    public List<ItemStackEntity> items(){
-        return world.getEntities().stream()
-                .filter(entity -> (entity instanceof ItemStackEntity))
-                .map(entity -> ((ItemStackEntity)entity))
                 .collect(Collectors.toUnmodifiableList());
     }
     public List<Particle> particles(){

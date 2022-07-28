@@ -17,7 +17,7 @@ public class Collisions {
             return false;
         return entity.getPhysicalObject().layer != EPhysicsLayer.TRANSPARENT;
     }
-    public static Entity lineIntersection(Vector2 start, Vector2 end, World world, Predicate<Entity> entityPredicate){
+    public static Raytracer.RaytraceResult lineIntersection(Vector2 start, Vector2 end, World world, Predicate<Entity> entityPredicate){
         Vector2 vec = null;
         Entity entityRet = null;
         for(Entity entity : world.getEntities()){
@@ -37,7 +37,7 @@ public class Collisions {
                 }
             }
         }
-        return entityRet;
+        return new Raytracer.RaytraceResult(entityRet, (int) (vec==null?start.distance(end):vec.distance(start)));
     }
 
     public static boolean AABB(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2){
@@ -50,7 +50,7 @@ public class Collisions {
         Vector2 in1 = lineIntersectLine(line1, line2, a, new Vector2(b.x, a.y));
         Vector2 in2 = lineIntersectLine(line1, line2, a, new Vector2(a.x, b.y));
         Vector2 in3 = lineIntersectLine(line1, line2, b, new Vector2(b.x, a.y));
-        Vector2 in4 = lineIntersectLine(line1, line2, b, new Vector2(b.x, a.y));
+        Vector2 in4 = lineIntersectLine(line1, line2, b, new Vector2(a.x, b.y));
 
         Vector2 leastDistance = in1;
         float leastDistanceF = in1==null?Float.MAX_VALUE:(float) leastDistance.distance(line1);

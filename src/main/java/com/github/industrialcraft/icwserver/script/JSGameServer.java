@@ -45,7 +45,7 @@ public class JSGameServer {
     public List<JSWorld> worlds(){
         return this.gameServer.getWorlds().stream().map(world -> new JSWorld(world)).collect(Collectors.toUnmodifiableList());
     }
-    public Entity raytrace(JSLocation start, float angle, int length, ScriptObjectMirror predicate){
+    public Raytracer.RaytraceResult raytrace(JSLocation start, float angle, int length, ScriptObjectMirror predicate){
         return Raytracer.raytrace(start.getInternal(), angle, length, entity -> predicate.call(null, new JSEntity(entity)).toString().equalsIgnoreCase("true"));
     }
     public void broadcastMessage(Message message){

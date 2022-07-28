@@ -168,7 +168,7 @@ public class GameServer extends Thread{
                     ItemStack hand = connection.player.getHandItemStack();
                     if(hand == null || !((Item) hand.getItem()).onAttackHandlerCall(connection.player, hand, msg)) {
                         connection.player.getLocation().world().addParticle(new Particle("fist", 5, connection.player.getLocation()).addNumber("angle", msg.angle));
-                        Entity entity = Raytracer.raytrace(connection.player.getLocation().addXY(2, 15), msg.angle, 50, ent -> ent.id != connection.player.id);
+                        Entity entity = Raytracer.raytrace(connection.player.getLocation().addXY(2, 15), msg.angle, 50, ent -> ent.id != connection.player.id).entity;
                         if(entity != null)
                             entity.damage(-15, EDamageType.FIST);
                     }

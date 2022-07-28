@@ -13,7 +13,7 @@ orb.withOnTick((function() {
 orb.withAnimationStateProvider((function() {
    return this.data.cnt;
 }));
-orb.withInventory(3);
+orb.withInventory(3, null, null);
 orb.withOnPlayerInteract((function(player,msg) {
     player.openInventory(this);
 }));

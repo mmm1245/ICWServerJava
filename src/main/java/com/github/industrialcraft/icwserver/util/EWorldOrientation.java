@@ -5,7 +5,7 @@ public enum EWorldOrientation {
     TOP_DOWN;
     public static EWorldOrientation byName(String name){
         for(EWorldOrientation worldOrientation : values()){
-            if(worldOrientation.name().equals(name))
+            if(worldOrientation.name().equalsIgnoreCase(name))
                 return worldOrientation;
         }
         return null;

@@ -79,8 +79,8 @@ public class JSEntityRegistry {
             this.physicsData = new PhysicsObjectDataHolder(width, height, physicsLayer);
             return this;
         }
-        public EntityTemplate withInventory(int size){
-            this.inventoryCreationData = new InventoryCreationData(size);
+        public EntityTemplate withInventory(int size, ScriptObjectMirror canPutMethod, ScriptObjectMirror inventoryActionMethod){
+            this.inventoryCreationData = new InventoryCreationData(size, canPutMethod, inventoryActionMethod);
             return this;
         }
         public EntityTemplate withPassengerData(int offsetX, int offsetY){

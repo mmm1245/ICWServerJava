@@ -15,12 +15,14 @@ public class Item implements IItem {
 
     private ScriptObjectMirror attackHandler;
     private ScriptObjectMirror animationStateProvider;
+    public final int fuelEfficiency;
     public final State2AssetStorage state2AssetStorage;
-    public Item(int stackSize, String identifier, ScriptObjectMirror attackHandler, ScriptObjectMirror animationStateProvider, State2AssetStorage state2AssetStorage) {
+    public Item(int stackSize, String identifier, ScriptObjectMirror attackHandler, ScriptObjectMirror animationStateProvider, int fuelEfficiency, State2AssetStorage state2AssetStorage) {
         this.stackSize = stackSize;
         this.identifier = identifier;
         this.attackHandler = attackHandler;
         this.animationStateProvider = animationStateProvider;
+        this.fuelEfficiency = fuelEfficiency;
         this.state2AssetStorage = state2AssetStorage;
     }
     public ItemStack create(int count){
@@ -47,6 +49,9 @@ public class Item implements IItem {
     }
     public String getIdentifier() {
         return identifier;
+    }
+    public boolean isFuel(){
+        return this.fuelEfficiency > 0;
     }
     @Override
     public int getStackSize() {

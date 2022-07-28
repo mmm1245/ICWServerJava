@@ -132,7 +132,7 @@ public class EntityFromJS extends Entity {
     @Override
     public void damage(float damage, EDamageType type){
         float damageNew = (damage*getDamageTypeModifier(type));
-        if(this.entityData.damageMethod != null && this.entityData.damageMethod.call(new JSEntity(this), damageNew, damage).toString().equals("true"))
+        if(this.entityData.damageMethod != null && this.entityData.damageMethod.call(new JSEntity(this), damageNew, damage).toString().equalsIgnoreCase("true"))
             return;
         float healthNew = getHealth()+damageNew;
         if(healthNew <= 0) {

@@ -27,11 +27,13 @@ public class JSItemRegistry {
         private int stackSize;
         private ScriptObjectMirror attackHandler;
         private ScriptObjectMirror animationStateProvider;
+        private int fuelEfficiency;
         private State2AssetStorage state2AssetStorage;
         public ItemTemplate(String id, int stackSize) {
             this.id = id;
             this.stackSize = stackSize;
             this.state2AssetStorage = new State2AssetStorage();
+            this.fuelEfficiency = -1;
         }
         public void addRenderState(String state, String asset){
             this.state2AssetStorage.addState(state, asset);
@@ -44,11 +46,15 @@ public class JSItemRegistry {
             this.animationStateProvider = animationStateProvider;
             return this;
         }
+        public ItemTemplate withFuelEfficiency(int fuelEfficiency){
+            this.fuelEfficiency = fuelEfficiency;
+            return this;
+        }
 
         public Item register(){
             if(items.containsKey(id))
                 throw new IllegalStateException(id + " already registered");
-            Item item = new Item(stackSize, id, attackHandler, animationStateProvider, state2AssetStorage);
+            Item item = new Item(stackSize, id, attackHandler, animationStateProvider, fuelEfficiency, state2AssetStorage);
             items.put(id, item);
             return item;
         }

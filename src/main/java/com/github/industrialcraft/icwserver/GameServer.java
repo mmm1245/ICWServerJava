@@ -15,6 +15,7 @@ import com.github.industrialcraft.icwserver.world.Particle;
 import com.github.industrialcraft.icwserver.world.World;
 import com.github.industrialcraft.icwserver.world.entity.*;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
+import com.github.industrialcraft.inventorysystem.EItemPutMode;
 import com.github.industrialcraft.inventorysystem.Inventory;
 import com.github.industrialcraft.inventorysystem.ItemStack;
 
@@ -85,7 +86,7 @@ public class GameServer extends Thread{
         for(ClientConnection connection : getWSServer().getClientConnections()){
             if(connection.player == null || connection.profile == null)
                 continue;
-            if(connection.profile.name().equals(name)){
+            if(connection.profile.name().equalsIgnoreCase(name)){
                 return connection.player;
             }
         }
@@ -190,8 +191,10 @@ public class GameServer extends Thread{
                         continue;
                     if(msg.slot >= 0 && msg.slot < inv.getSize()){
                         ItemStack hand = connection.player.getHandItemStack();
-                        connection.player.setHandItemStack(inv.getAt(msg.slot));
-                        inv.setAt(msg.slot, hand);
+                        if(inv.canPut(msg.slot, hand)) {
+                            connection.player.setHandItemStack(inv.getAt(msg.slot));
+                            inv.setAt(msg.slot, hand);
+                        }
                     }
                 }
                 if(pMsg instanceof OpenedInventoryActionMessage msg){

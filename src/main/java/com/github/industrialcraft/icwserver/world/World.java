@@ -49,7 +49,7 @@ public class World {
                 entity.onDeath();
         });
         entities.removeIf(entity -> entity.isDead()||entity.getLocation().world()!=this);
-        particles.removeIf(particle -> particle.decreaseLifetime(1));
+        particles.removeIf(particle -> particle.decreaseLifetime(1));//todo: move out of partial tick
     }
     public void addEntity(Entity entity){
         this.entitiesToAdd.add(entity);

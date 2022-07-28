@@ -225,6 +225,17 @@ public class CommandManager {
                     }
                     return 1;
                 }))));
+        this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("getdata")
+                .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer()).executes(context -> {
+                    Entity entity = context.getSource().getInternal().getServer().entityById(getInteger(context, "id"));
+                    ScriptingManager scriptingManager = context.getSource().getInternal().getServer().getScriptingManager();
+                    if(entity == null) {
+                        context.getSource().sendChatMessage("Entity not found");
+                        return 1;
+                    }
+                    context.getSource().sendChatMessage(scriptingManager.tryJsonToString(entity.data));
+                    return 1;
+        })));
         this.dispatcher.register(LiteralArgumentBuilder.<JSPlayer>literal("data")
             .then(RequiredArgumentBuilder.<JSPlayer,Integer>argument("id", integer())
             .then(RequiredArgumentBuilder.<JSPlayer,String>argument("data", greedyString()).executes(context -> {

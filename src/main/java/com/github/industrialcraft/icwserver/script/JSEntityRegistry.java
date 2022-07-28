@@ -34,6 +34,7 @@ public class JSEntityRegistry {
         private ScriptObjectMirror onPlayerInteractMethod;
         private ScriptObjectMirror damageTypeModifierMethod;
         private ScriptObjectMirror animationStateProvider;
+        private ScriptObjectMirror damageMethod;
         private PhysicsObjectDataHolder physicsData;
         private State2AssetStorage state2AssetStorage;
         private InventoryCreationData inventoryCreationData;
@@ -70,6 +71,10 @@ public class JSEntityRegistry {
             this.animationStateProvider = method;
             return this;
         }
+        public EntityTemplate withOnDamage(ScriptObjectMirror method){
+            this.damageMethod = method;
+            return this;
+        }
         public EntityTemplate withPhysicsData(int width, int height, EPhysicsLayer physicsLayer){
             this.physicsData = new PhysicsObjectDataHolder(width, height, physicsLayer);
             return this;
@@ -86,7 +91,7 @@ public class JSEntityRegistry {
         public JSEntityData register(){
             if(entities.containsKey(id))
                 throw new IllegalStateException(id + " already registered");
-            JSEntityData entityData = new JSEntityData(id, maxHealth, spawnMethod, tickMethod, onDeathMethod, onPlayerInteractMethod, damageTypeModifierMethod, animationStateProvider, physicsData, state2AssetStorage, inventoryCreationData, passengerData);
+            JSEntityData entityData = new JSEntityData(id, maxHealth, spawnMethod, tickMethod, onDeathMethod, onPlayerInteractMethod, damageTypeModifierMethod, animationStateProvider, damageMethod, physicsData, state2AssetStorage, inventoryCreationData, passengerData);
             entities.put(id, entityData);
             return entityData;
         }

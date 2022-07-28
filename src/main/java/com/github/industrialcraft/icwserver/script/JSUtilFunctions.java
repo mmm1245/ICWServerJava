@@ -45,4 +45,9 @@ public class JSUtilFunctions {
                 "    return Object.assign(obj);\n" +
                 "}");
     }
+    public static void defineJsonToString(ScriptEngine engine) throws ScriptException {
+        engine.eval("function jsonToString(obj){\n" +
+                "    return JSON.stringify(obj);\n" +
+                "}");
+    }
 }

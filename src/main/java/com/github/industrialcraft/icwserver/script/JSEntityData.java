@@ -16,11 +16,12 @@ public class JSEntityData {
     public final ScriptObjectMirror onPlayerInteractMethod;
     public final ScriptObjectMirror damageTypeModifierMethod;
     public final ScriptObjectMirror animationStateProvider;
+    public final ScriptObjectMirror damageMethod;
     public final PhysicsObjectDataHolder physicsData;
     public final State2AssetStorage state2AssetStorage;
     public final InventoryCreationData inventoryCreationData;
     public final PassengerData passengerData;
-    public JSEntityData(String type, float maxHealth, ScriptObjectMirror spawnMethod, ScriptObjectMirror tickMethod, ScriptObjectMirror onDeathMethod, ScriptObjectMirror onPlayerInteractMethod, ScriptObjectMirror damageTypeModifierMethod, ScriptObjectMirror animationStateProvider, PhysicsObjectDataHolder physicsData, State2AssetStorage state2AssetStorage, InventoryCreationData inventoryCreationData, PassengerData passengerData) {
+    public JSEntityData(String type, float maxHealth, ScriptObjectMirror spawnMethod, ScriptObjectMirror tickMethod, ScriptObjectMirror onDeathMethod, ScriptObjectMirror onPlayerInteractMethod, ScriptObjectMirror damageTypeModifierMethod, ScriptObjectMirror animationStateProvider, ScriptObjectMirror damageMethod, PhysicsObjectDataHolder physicsData, State2AssetStorage state2AssetStorage, InventoryCreationData inventoryCreationData, PassengerData passengerData) {
         this.type = type;
         this.maxHealth = maxHealth;
         this.spawnMethod = spawnMethod;
@@ -29,6 +30,7 @@ public class JSEntityData {
         this.onPlayerInteractMethod = onPlayerInteractMethod;
         this.damageTypeModifierMethod = damageTypeModifierMethod;
         this.animationStateProvider = animationStateProvider;
+        this.damageMethod = damageMethod;
         this.physicsData = physicsData;
         this.state2AssetStorage = state2AssetStorage;
         this.inventoryCreationData = inventoryCreationData;

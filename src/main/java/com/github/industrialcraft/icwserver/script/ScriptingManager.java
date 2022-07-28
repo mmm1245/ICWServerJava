@@ -6,6 +6,7 @@ import com.github.industrialcraft.icwserver.util.CommandManager;
 import com.github.industrialcraft.icwserver.util.EWorldOrientation;
 import com.github.industrialcraft.icwserver.world.entity.data.EDamageType;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import org.openjdk.nashorn.internal.runtime.ECMAException;
 
 import javax.script.*;
 import java.io.File;
@@ -75,6 +76,7 @@ public class ScriptingManager {
             JSUtilFunctions.defineObjectAssign(this.engine);
             JSUtilFunctions.defineEntityDataMerge(this.engine);
             JSUtilFunctions.defineDeepCopy(this.engine);
+            JSUtilFunctions.defineJsonToString(this.engine);
         } catch (ScriptException e) {
             e.printStackTrace();
             System.exit(0);
@@ -93,6 +95,13 @@ public class ScriptingManager {
             return null;
         }
     }
+    public String tryJsonToString(Object data){
+        try {
+            return getInvocable().invokeFunction("jsonToString", data).toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     public void runScripts(File... scripts){
         for(File file : scripts){
             try {
@@ -100,6 +109,7 @@ public class ScriptingManager {
                 engine.eval(reader);
                 reader.close();
             } catch (Exception e) {
+                System.out.println("Exception in: " + file.getName());
                 e.printStackTrace();
             }
         }
